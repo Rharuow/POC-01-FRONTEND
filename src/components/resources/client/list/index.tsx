@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createContext, useContext, useState } from "react";
 import { PlusCircle } from "lucide-react";
 
 import {
@@ -12,23 +12,25 @@ import { useQuery } from "@apollo/client";
 import { CardClient } from "./card";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Dialog, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { CreateClient } from "../create";
+import { Client } from "../client";
+
+const OpenCreateClientModalContext = createContext<{
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}>({
+  isOpen: false,
+  setIsOpen: () => {},
+});
+
+export const useOpenCreateClientModalContext = () =>
+  useContext(OpenCreateClientModalContext);
 
 export const ListClient = () => {
   const { data, loading } = useQuery<{ clients: Array<Client> }>(GET_CLIENTS);
 
-  console.log(data);
+  const [isOpenCreateClientModal, setIsOpenCreateClientModal] = useState(false);
 
   return (
     <Carousel className="w-full">
@@ -59,32 +61,42 @@ export const ListClient = () => {
             "lg:basis-1/4": self.length >= 4,
             "lg:basis-1/3": self.length === 3,
             "lg:basis-1/2": self.length <= 2,
-            "lg:basis-auto flex justify-center w-full": self.length === 0,
+            "lg:basis-auto flex justify-center grow": self.length === 0,
           })}
           key={data?.clients.length}
         >
-          <Dialog>
-            <DialogTrigger asChild>
-              <Card
-                className={cn(
-                  "h-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
-                  {
-                    "min-h-20": self.length === 0,
-                  }
-                )}
+          <OpenCreateClientModalContext.Provider
+            value={{
+              isOpen: isOpenCreateClientModal,
+              setIsOpen: setIsOpenCreateClientModal,
+            }}
+          >
+            <Dialog open={isOpenCreateClientModal}>
+              <DialogTrigger
+                asChild
+                onClick={() => setIsOpenCreateClientModal(true)}
               >
-                <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
-                  <PlusCircle />
-                  {self.length === 0 ? (
-                    <p>Nenhum cliente Cadastrado</p>
-                  ) : (
-                    <p>Adicionar Cliente</p>
+                <Card
+                  className={cn(
+                    "h-full w-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
+                    {
+                      "min-h-20": self.length === 0,
+                    }
                   )}
-                </CardContent>
-              </Card>
-            </DialogTrigger>
-            <CreateClient />
-          </Dialog>
+                >
+                  <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
+                    <PlusCircle />
+                    {self.length === 0 ? (
+                      <p>Nenhum cliente Cadastrado</p>
+                    ) : (
+                      <p>Adicionar Cliente</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </DialogTrigger>
+              <CreateClient />
+            </Dialog>
+          </OpenCreateClientModalContext.Provider>
         </CarouselItem>
       </CarouselContent>
     </Carousel>

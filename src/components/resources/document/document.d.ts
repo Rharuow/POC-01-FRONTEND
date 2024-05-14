@@ -1,5 +1,5 @@
-type Document = {
-  id: string;
-  cnpj: string;
-  cpf: string;
+export type Document = {
+  id?: string;
+  cnpj?: string;
+  cpf?: string;
 };
