@@ -1,4 +1,5 @@
 import { NavBar } from "@/components/nav-bar";
+import { ListClient } from "@/components/resources/client/list";
 import {
   Accordion,
   AccordionContent,
@@ -21,7 +22,7 @@ export default function Home() {
           <AccordionItem value="clients">
             <AccordionTrigger>Clientes</AccordionTrigger>
             <AccordionContent>
-              Yes. It adheres to the WAI-ARIA design pattern.
+              <ListClient />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="products">
