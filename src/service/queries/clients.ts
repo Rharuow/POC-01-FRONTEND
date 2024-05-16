@@ -17,3 +17,21 @@ export const GET_CLIENTS = gql`
     }
   }
 `;
+
+export const GET_CLIENT = gql`
+  query Client($where: ClientWhereUniqueInput!) {
+    getClient(where: $where) {
+      id
+      name
+      email
+      address {
+        billing
+        delivery
+      }
+      document {
+        cnpj
+        cpf
+      }
+    }
+  }
+`;

@@ -13,10 +13,11 @@ import { cpfIsValid } from "@/lib/validation/cpf";
 import { cn } from "@/lib/utils";
 import { cnpjIsValid } from "@/lib/validation/cnpj";
 import { useMutation } from "@apollo/client";
-import { CREATE_CLIENT } from "@/service/mutation/create/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { apolloClient } from "@/lib/apollo";
+import { Client } from "../client";
+import { UPDATE_CLIENT } from "@/service/mutation/client";
 
 interface IFormUpdateClient {
   name: string;
@@ -29,32 +30,27 @@ interface IFormUpdateClient {
 type ClientUpdateInput = {
   data: {
     address: {
-      connectOrCreate: {
-        create: {
-          billing: string;
-          delivery: string;
-        };
-        where: {
-          billing: string;
-          delivery: string;
-        };
-      }
+      update: {
+        data: {
+          billing: { set: string; }
+          delivery: { set: string; }
+        },
+      };
     };
     document: {
-      connectOrCreate: {
-        create: {
-          cnpj?: string;
-          cpf?: string;
-        };
-        where: {
-          cnpj?: string;
-          cpf?: string;
-        };
-      }
+      update: {
+        data: {
+          cnpj?: { set: string; }
+          cpf?: { set: string; }
+        },
+      };
     };
-    email: string;
-    name: string;
+    email: { set: string; }
+    name: { set: string; }
   };
+  where: {
+    id: string
+  }
 };
 
 const schema = z.object({
@@ -67,15 +63,22 @@ const schema = z.object({
   delivery: z.string().min(1, { message: "Endereço de entrega inválido" }),
 });
 
-export const FormUpdateClient = ({ setEditModalIsOpen }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
-  const [createOneClient] = useMutation(CREATE_CLIENT);
+export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>; client: Client }) => {
+  const [updateOneClient] = useMutation(UPDATE_CLIENT);
 
   const methods = useForm<IFormUpdateClient>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      billing: client.address?.billing,
+      delivery: client.address?.delivery,
+      documentation: client.document?.cnpj || client.document?.cpf,
+      email: client.email,
+      name: client.name
+    }
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [typeDocument, setTypeDocument] = useState<"cpf" | "cnpj">("cpf");
+  const [typeDocument, setTypeDocument] = useState<"cpf" | "cnpj">(client.document?.cnpj ? "cnpj" : "cpf");
   const [cpfIsInvalid, setCpfIsInvalid] = useState(false);
   const [cnpjIsInvalid, setCnpjIsInvalid] = useState(false);
 
@@ -89,53 +92,48 @@ export const FormUpdateClient = ({ setEditModalIsOpen }: { setEditModalIsOpen: R
   async function onSubmit(data: IFormUpdateClient) {
     try {
       setIsLoading(true);
-      const { documentation, billing, delivery, ...dataSpread } = data;
+      const { documentation, billing, delivery, email, name } = data;
       const formattedData: ClientUpdateInput = {
         data: {
-          ...dataSpread,
+          email: { set: email },
+          name: { set: name },
           document: {
-            connectOrCreate: {
-              create: {
+            update: {
+              data: {
                 ...(typeDocument === "cnpj"
-                  ? { cnpj: documentation }
-                  : { cpf: documentation }),
-              },
-              where: {
-                ...(typeDocument === "cnpj"
-                  ? { cnpj: documentation }
-                  : { cpf: documentation }),
+                  ? { cnpj: { set: documentation } }
+                  : { cpf: { set: documentation } }),
               }
             },
           },
           address: {
-            connectOrCreate: {
-              create: {
-                billing,
-                delivery,
-              },
-              where: {
-                billing,
-                delivery,
+            update: {
+              data: {
+                billing: { set: billing },
+                delivery: { set: delivery },
               }
             },
           },
         },
+        where: {
+          id: String(client.id)
+        }
       };
 
-      await createOneClient({
+      await updateOneClient({
         variables: formattedData,
-        update: (cache, { data: { createOneClient } }) => {
+        update: (cache, { data: { updateOneClient } }) => {
           const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
 
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              clients: [...clients, createOneClient],
+              clients: [...clients.filter((clt: Client) => clt.id !== client.id), updateOneClient],
             },
           });
         },
       });
-      toast("Cliente criado com sucesso");
+      toast("Cliente atualizado com sucesso");
       setEditModalIsOpen(false);
     } catch (error) {
       console.log(error);
@@ -323,6 +321,14 @@ export const FormUpdateClient = ({ setEditModalIsOpen }: { setEditModalIsOpen: R
         >
           Salvar
         </Button>
+        <Button
+          type="button"
+          variant={"outline"}
+          onClick={() => setEditModalIsOpen(false)}
+        >
+          Cancelar
+        </Button>
+
       </form>
     </FormProvider>
   );

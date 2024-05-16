@@ -5,9 +5,9 @@ import { Client } from '../client'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useMutation } from '@apollo/client'
-import { DELETE_CLIENT } from '@/service/mutation/delete/client'
 import { GET_CLIENTS } from '@/service/queries/clients'
 import { apolloClient } from '@/lib/apollo'
+import { DELETE_CLIENT } from '@/service/mutation/client'
 
 export default function DeleteClient({ client }: { client: Client }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)

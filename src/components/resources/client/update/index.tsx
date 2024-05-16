@@ -3,9 +3,17 @@ import { Pencil } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { useQuery } from '@apollo/client'
+import { GET_CLIENT } from '@/service/queries/clients'
+import { Skeleton } from '@/components/ui/skeleton'
+import { FormUpdateClient } from './form'
 
 export default function UpdateClient({ id }: { id: string }) {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false)
+
+  const { loading, data } = useQuery(GET_CLIENT, {
+    variables: { where: { id } }
+  })
 
   return (
     <Dialog open={editModalIsOpen}>
@@ -14,14 +22,10 @@ export default function UpdateClient({ id }: { id: string }) {
       </DialogTrigger>
       <DialogContent>
         <div className="flex flex-col gap-4">
-
-          <DialogFooter>
-            <div className="flex gap-2">
-              <Button type='submit'>Salvar</Button>
-              <Button onClick={() => setEditModalIsOpen(false)}>Cancelar</Button>
-            </div>
-          </DialogFooter>
-
+          {
+            loading ? <Skeleton className='h-96 w-full' /> :
+              <FormUpdateClient setEditModalIsOpen={setEditModalIsOpen} client={data?.getClient} />
+          }
         </div>
       </DialogContent>
     </Dialog>

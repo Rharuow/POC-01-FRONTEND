@@ -13,11 +13,11 @@ import { cpfIsValid } from "@/lib/validation/cpf";
 import { cn } from "@/lib/utils";
 import { cnpjIsValid } from "@/lib/validation/cnpj";
 import { useMutation } from "@apollo/client";
-import { CREATE_CLIENT } from "@/service/mutation/create/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOpenCreateClientModalContext } from "../list";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { apolloClient } from "@/lib/apollo";
+import { CREATE_CLIENT } from "@/service/mutation/client";
 
 interface IFormCreateClient {
   name: string;
