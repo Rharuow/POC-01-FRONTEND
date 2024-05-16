@@ -30,16 +30,28 @@ interface IFormCreateClient {
 type ClientCreateInput = {
   data: {
     address: {
-      create: {
-        billing: string;
-        delivery: string;
-      };
+      connectOrCreate: {
+        create: {
+          billing: string;
+          delivery: string;
+        };
+        where: {
+          billing: string;
+          delivery: string;
+        };
+      }
     };
     document: {
-      create: {
-        cnpj?: string;
-        cpf?: string;
-      };
+      connectOrCreate: {
+        create: {
+          cnpj?: string;
+          cpf?: string;
+        };
+        where: {
+          cnpj?: string;
+          cpf?: string;
+        };
+      }
     };
     email: string;
     name: string;
@@ -84,16 +96,29 @@ export const FormCreateClient = () => {
         data: {
           ...dataSpread,
           document: {
-            create: {
-              ...(typeDocument === "cnpj"
-                ? { cnpj: documentation }
-                : { cpf: documentation }),
+            connectOrCreate: {
+              create: {
+                ...(typeDocument === "cnpj"
+                  ? { cnpj: documentation }
+                  : { cpf: documentation }),
+              },
+              where: {
+                ...(typeDocument === "cnpj"
+                  ? { cnpj: documentation }
+                  : { cpf: documentation }),
+              }
             },
           },
           address: {
-            create: {
-              billing,
-              delivery,
+            connectOrCreate: {
+              create: {
+                billing,
+                delivery,
+              },
+              where: {
+                billing,
+                delivery,
+              }
             },
           },
         },
@@ -118,7 +143,7 @@ export const FormCreateClient = () => {
       console.log(error);
       toast("Desculpe, algo está errado!");
     } finally {
-      setIsLoading(true);
+      setIsLoading(false);
     }
   }
 

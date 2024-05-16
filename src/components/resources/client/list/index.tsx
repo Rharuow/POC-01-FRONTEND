@@ -21,7 +21,7 @@ const OpenCreateClientModalContext = createContext<{
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   isOpen: false,
-  setIsOpen: () => {},
+  setIsOpen: () => { },
 });
 
 export const useOpenCreateClientModalContext = () =>
@@ -37,31 +37,31 @@ export const ListClient = () => {
       <CarouselContent className="w-full">
         {loading
           ? Array.from({ length: 4 }).map((_, index) => (
-              <CarouselItem
-                className="md:basis-1/2 lg:basis-1/4 flex justify-center"
-                key={index}
-              >
-                <Skeleton className="w-full h-20" />
-              </CarouselItem>
-            ))
+            <CarouselItem
+              className="md:basis-1/2 lg:basis-1/4 flex justify-center"
+              key={index}
+            >
+              <Skeleton className="w-full h-20" />
+            </CarouselItem>
+          ))
           : data?.clients.map((client, _, self) => (
-              <CarouselItem
-                className={cn("md:basis-1/2", {
-                  "lg:basis-1/4": self.length >= 4,
-                  "lg:basis-1/3": self.length === 3,
-                  "lg:basis-1/2": self.length <= 2,
-                })}
-                key={client.id}
-              >
-                <CardClient client={client} />
-              </CarouselItem>
-            ))}
+            <CarouselItem
+              className={cn("md:basis-1/2", {
+                "lg:basis-1/4": self.length >= 4,
+                "lg:basis-1/3": self.length === 3,
+                "lg:basis-1/2": self.length <= 2,
+              })}
+              key={client.id}
+            >
+              <CardClient client={client} />
+            </CarouselItem>
+          ))}
         <CarouselItem
           className={cn("md:basis-1/2", {
-            "lg:basis-1/4": self.length >= 4,
-            "lg:basis-1/3": self.length === 3,
-            "lg:basis-1/2": self.length <= 2,
-            "lg:basis-auto flex justify-center grow": self.length === 0,
+            "lg:basis-1/4": data?.clients && data?.clients.length >= 4,
+            "lg:basis-1/3": data?.clients.length === 3,
+            "lg:basis-1/2": data?.clients && data?.clients.length <= 2,
+            "lg:basis-auto flex justify-center grow": data?.clients.length === 0,
           })}
           key={data?.clients.length}
         >
@@ -80,13 +80,13 @@ export const ListClient = () => {
                   className={cn(
                     "h-full w-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
                     {
-                      "min-h-20": self.length === 0,
+                      "min-h-20": data?.clients.length === 0,
                     }
                   )}
                 >
                   <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
                     <PlusCircle />
-                    {self.length === 0 ? (
+                    {data?.clients.length === 0 ? (
                       <p>Nenhum cliente Cadastrado</p>
                     ) : (
                       <p>Adicionar Cliente</p>
