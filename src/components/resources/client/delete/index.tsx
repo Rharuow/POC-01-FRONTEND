@@ -19,7 +19,6 @@ export default function DeleteClient({ client }: { client: Client }) {
       await deleteOneClient({
         variables: { where: { id } },
         update: (cache, { data: { deleteOneClient } }) => {
-          console.log("deleteOneClient = ", deleteOneClient);
           const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
 
           cache.writeQuery({
