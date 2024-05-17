@@ -1,5 +1,6 @@
 import { NavBar } from "@/components/nav-bar";
 import { ListClient } from "@/components/resources/client/list";
+import { ListProduct } from "@/components/resources/product/list";
 import {
   Accordion,
   AccordionContent,
@@ -28,8 +29,7 @@ export default function Home() {
           <AccordionItem value="products">
             <AccordionTrigger>Produtos</AccordionTrigger>
             <AccordionContent>
-              Yes. It comes with default styles that matches the other
-              components&apos; aesthetic.
+              <ListProduct />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
