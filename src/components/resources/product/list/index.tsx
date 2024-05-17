@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Product } from "../product";
 import { GET_PRODUCTS } from "@/service/queries/products";
+import { CreateProduct } from "../create";
 
 const OpenCreateProductModalContext = createContext<{
   isOpen: boolean;
@@ -56,11 +57,11 @@ export const ListProduct = () => {
             </CarouselItem>
           ))}
         <CarouselItem
-          className={cn("md:basis-1/2", {
-            "lg:basis-1/4": data?.products && data?.products.length >= 4,
-            "lg:basis-1/3": data?.products.length === 3,
-            "lg:basis-1/2": data?.products && data?.products.length <= 2,
+          className={cn({
             "lg:basis-auto flex justify-center grow": data?.products.length === 0,
+            "md:basis-1/2 lg:basis-1/4": data?.products && data?.products.length >= 4,
+            "md:basis-1/2 lg:basis-1/3": data?.products.length === 3,
+            "md:basis-1/2 lg:basis-1/2": data?.products && data?.products.length <= 2,
           })}
           key={data?.products.length}
         >
@@ -93,7 +94,7 @@ export const ListProduct = () => {
                   </CardContent>
                 </Card>
               </DialogTrigger>
-              {/* <CreateProduct /> */}
+              <CreateProduct />
             </Dialog>
           </OpenCreateProductModalContext.Provider>
         </CarouselItem>

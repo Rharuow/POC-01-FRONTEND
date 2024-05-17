@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/accordion";
 import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
     <main
-      className={`bg-gray-900 min-h-svh flex flex-col gap-4 justify-between text-white ${inter.className}`}
+      className="bg-gray-900 min-h-svh flex flex-col gap-4 justify-between text-white"
     >
       <NavBar />
 

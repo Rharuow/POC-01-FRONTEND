@@ -57,11 +57,11 @@ export const ListClient = () => {
             </CarouselItem>
           ))}
         <CarouselItem
-          className={cn("md:basis-1/2", {
-            "lg:basis-1/4": data?.clients && data?.clients.length >= 4,
-            "lg:basis-1/3": data?.clients.length === 3,
-            "lg:basis-1/2": data?.clients && data?.clients.length <= 2,
+          className={cn({
             "lg:basis-auto flex justify-center grow": data?.clients.length === 0,
+            "md:basis-1/2 lg:basis-1/4": data?.clients && data?.clients.length >= 4,
+            "md:basis-1/2 lg:basis-1/3": data?.clients.length === 3,
+            "md:basis-1/2 lg:basis-1/2": data?.clients && data?.clients.length <= 2,
           })}
           key={data?.clients.length}
         >
