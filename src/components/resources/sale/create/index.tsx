@@ -6,6 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useOpenCreateSaleModalContext } from "../list";
+import { FormCreateSale } from "./form";
 
 export const CreateSale = () => {
   const { setIsOpen } = useOpenCreateSaleModalContext();
