@@ -7,11 +7,7 @@ import { Sale } from "../sale";
 
 export const CardSale = ({ sale }: { sale: Sale }) => {
 
-  const [totalPrice, totalProducts] = sale.orders?.reduce((accumulator, order) => {
-    accumulator[0] += order.product?.price || 0
-    accumulator[1] += order?.amount || 0
-    return accumulator
-  }, [0, 0]) as Array<number>
+  const totalProducts = sale.orders?.reduce((accumulator, order) => accumulator += order?.amount || 0, 0)
 
   return (
     <Card className="h-full relative">
@@ -31,7 +27,7 @@ export const CardSale = ({ sale }: { sale: Sale }) => {
             <li>Valor total: <strong>{order.totalPrice}</strong></li>
           </ul>
         ))}
-        <p>Total da venda: {totalPrice}</p>
+        <p>Total da venda: {sale.totalPrice}</p>
       </CardHeader>
       <div className="absolute top-1 right-1 flex gap-1">
         {/* <DeleteSale sale={sale} />

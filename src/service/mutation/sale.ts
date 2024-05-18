@@ -1,16 +1,23 @@
 import { gql } from "@apollo/client";
 
 export const CREATE_SALE = gql`
-  mutation CreateOneProduct($data: ProductCreateInput!) {
-    createOneProduct(data: $data) {
+  mutation CreateOneSale($data: SaleCreateInput!) {
+    createOneSale(data: $data) {
       id
-      name
-      description
-      price
-      inventory_quantity
-      categories {
-        category {
+      client {
+        id
+        name
+        address {
+          delivery
+          billing
+        }
+      }
+      orders {
+        amount
+        totalPrice
+        product {
           name
+          price
         }
       }
     }
@@ -18,27 +25,34 @@ export const CREATE_SALE = gql`
 `;
 
 export const DELETE_SALE = gql`
-  mutation DeleteOneProduct($where: ProductWhereUniqueInput!) {
-    deleteOneProduct(where: $where) {
+  mutation DeleteOneSale($where: SaleWhereUniqueInput!) {
+    deleteOneSale(where: $where) {
       id
     }
   }
 `;
 
 export const UPDATE_SALE = gql`
-  mutation UpdateOneProduct(
-    $data: ProductUpdateInput!
-    $where: ProductWhereUniqueInput!
+  mutation UpdateOneSale(
+    $data: SaleUpdateInput!
+    $where: SaleWhereUniqueInput!
   ) {
-    updateOneProduct(data: $data, where: $where) {
+    updateOneSale(data: $data, where: $where) {
       id
-      name
-      description
-      price
-      inventory_quantity
-      categories {
-        category {
+      client {
+        id
+        name
+        address {
+          delivery
+          billing
+        }
+      }
+      orders {
+        amount
+        totalPrice
+        product {
           name
+          price
         }
       }
     }

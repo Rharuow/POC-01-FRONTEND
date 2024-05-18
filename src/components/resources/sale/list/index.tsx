@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Sale } from "../sale";
 import { GET_SALES } from "@/service/queries/sale";
+import { CreateSale } from "../create";
 
 const OpenCreateSaleModalContext = createContext<{
   isOpen: boolean;
@@ -93,7 +94,7 @@ export const ListSale = () => {
                   </CardContent>
                 </Card>
               </DialogTrigger>
-              {/* <CreateSale /> */}
+              <CreateSale />
             </Dialog>
           </OpenCreateSaleModalContext.Provider>
         </CarouselItem>
