@@ -22,6 +22,7 @@ import { arraysAreIdentical } from "@/lib/validation/compareTwoArrays";
 interface IFormUpdateProduct {
   name: string;
   description: string;
+  price: number;
   inventory_quantity: number;
   categories?: Array<{ name: string }>
 }
@@ -29,6 +30,7 @@ interface IFormUpdateProduct {
 type ProductUpdateInput = {
   data: {
     name: { set: string };
+    price: { set: number };
     description: { set: string };
     inventory_quantity: { set: number };
     categories?: {
@@ -54,6 +56,7 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
     defaultValues: {
       name: product.name,
       description: product.description,
+      price: product.price,
       inventory_quantity: product.inventory_quantity,
       categories: product.categories?.map(cat => ({ name: cat.category.name }))
     }
@@ -71,7 +74,6 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
 
 
   async function onSubmit(data: IFormUpdateProduct) {
-    console.log(arraysAreIdentical(product.categories?.map(category => ({ name: category.category.name })), getValues("categories")?.map(category => ({ name: category.name }))));
     try {
       setIsLoading(true);
       const { name, description } = data;
@@ -79,6 +81,9 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
         data: {
           name: { set: name },
           description: { set: description },
+          price: {
+            set: parseFloat(String(getValues("price")))
+          },
           inventory_quantity: { set: getValues("inventory_quantity") },
         },
         where: {
@@ -153,7 +158,7 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
+        <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
           {isLoading ? (
             <Skeleton className="w-full h-10 rounded-full" />
           ) : (
@@ -169,6 +174,27 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
               {errors && errors.name && (
                 <span className="text-xs text-red-400 font-bold">
                   {errors.name.message}
+                </span>
+              )}
+            </div>
+          )}
+          {isLoading ? (
+            <Skeleton className="w-full h-10 rounded-full" />
+          ) : (
+            <div className="flex flex-col">
+              <Input
+                label="Valor"
+                inputMode="numeric"
+                step={0.01}
+                {...register("price")}
+                className={cn({
+                  "border border-red-700": errors && errors.price,
+                })}
+                type="number"
+              />
+              {errors && errors.price && (
+                <span className="text-xs text-red-400 font-bold">
+                  {errors.price.message}
                 </span>
               )}
             </div>
@@ -237,10 +263,10 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
         }
 
         <Button
-        // disabled={
-        //   Object.keys(errors).length !== 0 ||
-        //   isLoading
-        // }
+          disabled={
+            Object.keys(errors).length !== 0 ||
+            isLoading
+          }
         >
           Salvar
         </Button>

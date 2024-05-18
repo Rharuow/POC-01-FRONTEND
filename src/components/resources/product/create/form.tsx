@@ -21,6 +21,7 @@ import { Category } from "../../category/category";
 type IFormCreateProduct = {
   name: string;
   description: string;
+  price: number;
   inventory_quantity: number;
   categories: Array<{ name: string }>
 }
@@ -29,6 +30,7 @@ type ProcutCreateInput = {
   data: {
     name: string;
     description: string;
+    price: number;
     inventory_quantity: number;
     categories: {
       createMany: {
@@ -41,6 +43,8 @@ type ProcutCreateInput = {
 const schema = z.object({
   name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
   description: z.string().min(10, { message: "Pelo menos 10 caracteres" }),
+  price: z.preprocess((a) => parseInt(z.string().parse(a), 10),
+    z.number()),
   inventory_quantity: z.preprocess((a) => parseInt(z.string().parse(a), 10),
     z.number())
 });
@@ -71,11 +75,13 @@ export const FormCreateProduct = () => {
   });
 
   async function onSubmit(data: IFormCreateProduct) {
+
     try {
       setIsLoading(true);
       const formattedData: ProcutCreateInput = {
         data: {
           name: data.name,
+          price: parseFloat(String(getValues("price"))),
           description: data.description,
           inventory_quantity: data.inventory_quantity,
           ...(data.categories && {
@@ -120,7 +126,7 @@ export const FormCreateProduct = () => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
+        <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
           {isLoading ? (
             <Skeleton className="w-full h-10 rounded-full" />
           ) : (
@@ -136,6 +142,27 @@ export const FormCreateProduct = () => {
               {errors && errors.name && (
                 <span className="text-xs text-red-400 font-bold">
                   {errors.name.message}
+                </span>
+              )}
+            </div>
+          )}
+          {isLoading ? (
+            <Skeleton className="w-full h-10 rounded-full" />
+          ) : (
+            <div className="flex flex-col">
+              <Input
+                label="Valor"
+                inputMode="numeric"
+                step={0.01}
+                {...register("price")}
+                className={cn({
+                  "border border-red-700": errors && errors.price,
+                })}
+                type="number"
+              />
+              {errors && errors.price && (
+                <span className="text-xs text-red-400 font-bold">
+                  {errors.price.message}
                 </span>
               )}
             </div>

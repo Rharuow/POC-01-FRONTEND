@@ -6,6 +6,7 @@ export const CREATE_PRODUCT = gql`
       id
       name
       description
+      price
       inventory_quantity
       categories {
         category {
@@ -33,6 +34,7 @@ export const UPDATE_PRODUCT = gql`
       id
       name
       description
+      price
       inventory_quantity
       categories {
         category {
