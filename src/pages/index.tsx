@@ -1,6 +1,7 @@
 import { NavBar } from "@/components/nav-bar";
 import { ListClient } from "@/components/resources/client/list";
 import { ListProduct } from "@/components/resources/product/list";
+import { ListSale } from "@/components/resources/sale/list";
 import {
   Accordion,
   AccordionContent,
@@ -32,10 +33,9 @@ export default function Home() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3">
-            <AccordionTrigger>Is it animated?</AccordionTrigger>
+            <AccordionTrigger>Vendas</AccordionTrigger>
             <AccordionContent>
-              Yes. It&apos;s animated by default, but you can disable it if you
-              prefer.
+              <ListSale />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

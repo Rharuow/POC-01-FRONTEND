@@ -8,15 +8,14 @@ import {
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@apollo/client";
-import { CardProduct } from "./card";
+import { CardSale } from "./card";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Product } from "../product";
-import { GET_PRODUCTS } from "@/service/queries/products";
-import { CreateProduct } from "../create";
+import { Sale } from "../sale";
+import { GET_SALES } from "@/service/queries/sale";
 
-const OpenCreateProductModalContext = createContext<{
+const OpenCreateSaleModalContext = createContext<{
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
@@ -24,13 +23,13 @@ const OpenCreateProductModalContext = createContext<{
   setIsOpen: () => { },
 });
 
-export const useOpenCreateProductModalContext = () =>
-  useContext(OpenCreateProductModalContext);
+export const useOpenCreateSaleModalContext = () =>
+  useContext(OpenCreateSaleModalContext);
 
-export const ListProduct = () => {
-  const { data, loading } = useQuery<{ products: Array<Product> }>(GET_PRODUCTS);
+export const ListSale = () => {
+  const { data, loading } = useQuery<{ sales: Array<Sale> }>(GET_SALES);
 
-  const [isOpenCreateProductModal, setIsOpenCreateProductModal] = useState(false);
+  const [isOpenCreateSaleModal, setIsOpenCreateSaleModal] = useState(false);
 
   return (
     <Carousel className="w-full">
@@ -44,59 +43,59 @@ export const ListProduct = () => {
               <Skeleton className="w-full h-20" />
             </CarouselItem>
           ))
-          : data?.products.map((product, _, self) => (
+          : data?.sales.map((sale, _, self) => (
             <CarouselItem
               className={cn("md:basis-1/2", {
                 "lg:basis-1/4": self.length >= 4,
                 "lg:basis-1/3": self.length === 3,
                 "lg:basis-1/2": self.length <= 2,
               })}
-              key={product.id}
+              key={sale.id}
             >
-              <CardProduct product={product} />
+              <CardSale sale={sale} />
             </CarouselItem>
           ))}
         <CarouselItem
           className={cn({
-            "lg:basis-auto flex justify-center grow": data?.products.length === 0,
-            "md:basis-1/2 lg:basis-1/4": data?.products && data?.products.length >= 4,
-            "md:basis-1/2 lg:basis-1/3": data?.products.length === 3,
-            "md:basis-1/2 lg:basis-1/2": data?.products && data?.products.length <= 2,
+            "lg:basis-auto flex justify-center grow": data?.sales.length === 0,
+            "md:basis-1/2 lg:basis-1/4": data?.sales && data?.sales.length >= 4,
+            "md:basis-1/2 lg:basis-1/3": data?.sales.length === 3,
+            "md:basis-1/2 lg:basis-1/2": data?.sales && data?.sales.length <= 2,
           })}
-          key={data?.products.length}
+          key={data?.sales.length}
         >
-          <OpenCreateProductModalContext.Provider
+          <OpenCreateSaleModalContext.Provider
             value={{
-              isOpen: isOpenCreateProductModal,
-              setIsOpen: setIsOpenCreateProductModal,
+              isOpen: isOpenCreateSaleModal,
+              setIsOpen: setIsOpenCreateSaleModal,
             }}
           >
-            <Dialog open={isOpenCreateProductModal}>
+            <Dialog open={isOpenCreateSaleModal}>
               <DialogTrigger
                 asChild
-                onClick={() => setIsOpenCreateProductModal(true)}
+                onClick={() => setIsOpenCreateSaleModal(true)}
               >
                 <Card
                   className={cn(
                     "h-full w-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
                     {
-                      "min-h-20": data?.products.length === 0,
+                      "min-h-20": data?.sales.length === 0,
                     }
                   )}
                 >
                   <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
                     <PlusCircle />
-                    {data?.products.length === 0 ? (
-                      <p>Nenhum produto Cadastrado</p>
+                    {data?.sales.length === 0 ? (
+                      <p>Nenhuma venda Cadastrado</p>
                     ) : (
-                      <p>Adicionar produto</p>
+                      <p>Adicionar venda</p>
                     )}
                   </CardContent>
                 </Card>
               </DialogTrigger>
-              <CreateProduct />
+              {/* <CreateSale /> */}
             </Dialog>
-          </OpenCreateProductModalContext.Provider>
+          </OpenCreateSaleModalContext.Provider>
         </CarouselItem>
       </CarouselContent>
     </Carousel>

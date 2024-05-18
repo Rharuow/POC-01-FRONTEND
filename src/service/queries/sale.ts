@@ -1,14 +1,21 @@
 import { gql } from "@apollo/client";
 
 export const GET_SALES = gql`
-  query {
-    products {
+  query Sales {
+    sales {
       id
-      name
-      description
-      inventory_quantity
-      categories {
-        category {
+      totalPrice
+      client {
+        id
+        name
+        email
+      }
+      orders {
+        id
+        amount
+        totalPrice
+        product {
+          id
           name
         }
       }
