@@ -7,6 +7,6 @@ export type Product = {
   description?: string;
   inventory_quantity: number;
 
-  categories?: Array<Category>
-  orders?: Array<Order>
-}
+  categories?: Array<{ category: Category }>;
+  orders?: Array<Order>;
+};

@@ -23,3 +23,22 @@ export const DELETE_PRODUCT = gql`
     }
   }
 `;
+
+export const UPDATE_PRODUCT = gql`
+  mutation UpdateOneProduct(
+    $data: ProductUpdateInput!
+    $where: ProductWhereUniqueInput!
+  ) {
+    updateOneProduct(data: $data, where: $where) {
+      id
+      name
+      description
+      inventory_quantity
+      categories {
+        category {
+          name
+        }
+      }
+    }
+  }
+`;

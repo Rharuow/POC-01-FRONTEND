@@ -3,106 +3,134 @@ import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useMutation, useQuery } from "@apollo/client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useMutation, useQuery } from "@apollo/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apolloClient } from "@/lib/apollo";
-import { CREATE_PRODUCT } from "@/service/mutation/product";
-import { useOpenCreateProductModalContext } from "../list";
+import { Product } from "../product";
+import { UPDATE_PRODUCT } from "@/service/mutation/product";
 import { GET_PRODUCTS } from "@/service/queries/products";
 import { Textarea } from "@/components/ui/textarea";
-import { Toggle } from "@/components/ui/toggle";
 import { GET_CATEGORIES } from "@/service/queries/category";
 import { Category } from "../../category/category";
+import { Toggle } from "@/components/ui/toggle";
+import { arraysAreIdentical } from "@/lib/validation/compareTwoArrays";
 
-type IFormCreateProduct = {
+interface IFormUpdateProduct {
   name: string;
   description: string;
   inventory_quantity: number;
-  categories: Array<{ name: string }>
+  categories?: Array<{ name: string }>
 }
 
-type ProcutCreateInput = {
+type ProductUpdateInput = {
   data: {
-    name: string;
-    description: string;
-    inventory_quantity: number;
-    categories: {
-      createMany: {
-        data: Array<{ categoryName: string }>
-      }
+    name: { set: string };
+    description: { set: string };
+    inventory_quantity: { set: number };
+    categories?: {
+      set: Array<{ categoryName: { equals: string } }>
     }
   };
+  where: {
+    id: string
+  }
 };
 
 const schema = z.object({
   name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
   description: z.string().min(10, { message: "Pelo menos 10 caracteres" }),
-  inventory_quantity: z.preprocess((a) => parseInt(z.string().parse(a), 10),
-    z.number())
 });
 
-export const FormCreateProduct = () => {
-  const [createOneProduct] = useMutation(CREATE_PRODUCT);
+export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>; product: Product }) => {
+  const [updateOneProduct] = useMutation(UPDATE_PRODUCT);
   const { data: categoryData } = useQuery<{ categories: Array<Category> }>(GET_CATEGORIES)
 
-  const { setIsOpen } = useOpenCreateProductModalContext();
-
-  const methods = useForm<IFormCreateProduct>({
+  const methods = useForm<IFormUpdateProduct>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      name: product.name,
+      description: product.description,
+      inventory_quantity: product.inventory_quantity,
+      categories: product.categories?.map(cat => ({ name: cat.category.name }))
+    }
   });
 
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     handleSubmit,
-    getValues,
     register,
+    getValues,
     control,
     formState: { errors },
   } = methods;
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "categories", // unique name for your Field Array
-  });
 
-  async function onSubmit(data: IFormCreateProduct) {
+  async function onSubmit(data: IFormUpdateProduct) {
+    console.log(arraysAreIdentical(product.categories?.map(category => ({ name: category.category.name })), getValues("categories")?.map(category => ({ name: category.name }))));
     try {
       setIsLoading(true);
-      const formattedData: ProcutCreateInput = {
+      const { name, description } = data;
+      const formattedData: ProductUpdateInput = {
         data: {
-          name: data.name,
-          description: data.description,
-          inventory_quantity: data.inventory_quantity,
-          ...(data.categories && {
-            categories: {
-              createMany: {
-                data: data.categories.map(category => ({ categoryName: category.name }))
-              }
-            }
-          })
+          name: { set: name },
+          description: { set: description },
+          inventory_quantity: { set: getValues("inventory_quantity") },
+        },
+        where: {
+          id: String(product.id)
         }
       };
 
-      await createOneProduct({
+      // If some categories forms are different of the product's categories 
+      if (!arraysAreIdentical(product.categories?.map(category => ({ name: category.category.name })), getValues("categories")?.map(category => ({ name: category.name })))) {
+        await updateOneProduct({
+          variables: {
+            data: {
+              categories: {
+                deleteMany: {
+                  productId: { equals: product.id }
+                }
+              }
+            },
+            where: { id: product.id }
+          },
+        });
+
+        await updateOneProduct({
+          variables: {
+            data: {
+              categories: {
+                createMany: {
+                  data: getValues("categories")?.map(category => ({ categoryName: category.name })),
+                  skipDuplicates: true
+                }
+              }
+            },
+            where: { id: product.id }
+          },
+        });
+      }
+
+      await updateOneProduct({
         variables: formattedData,
-        update: (cache, { data: { createOneProduct } }) => {
+        update: (cache, { data: { updateOneProduct } }) => {
           const { products } = apolloClient.readQuery({ query: GET_PRODUCTS });
 
           cache.writeQuery({
             query: GET_PRODUCTS,
             data: {
-              products: [...products, createOneProduct],
+              products: [...products.filter((pdt: Product) => pdt.id !== product.id), updateOneProduct],
             },
           });
         },
       });
-      toast("Produto criado com sucesso");
-      setIsOpen(false);
+      toast("Produto atualizado com sucesso");
+      setEditModalIsOpen(false);
     } catch (error) {
       console.log(error);
       toast("Desculpe, algo está errado!");
@@ -111,8 +139,13 @@ export const FormCreateProduct = () => {
     }
   }
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "categories", // unique name for your Field Array
+  });
+
   function handleSelectCategory(category: string) {
-    getValues("categories").some(cat => cat.name === category) ?
+    getValues("categories")?.some(cat => cat.name === category) ?
       remove(fields.findIndex(field => field.name === category)) :
       append({ name: category })
   }
@@ -186,7 +219,7 @@ export const FormCreateProduct = () => {
             <p>Categorias</p>
             <div className="flex flex-wrap gap-2">
               {categoryData && categoryData.categories.length > 0 && categoryData.categories.map((category) => (
-                <Toggle size={"sm"} key={category.name} className="border rounded-full" onClick={() => handleSelectCategory(String(category.name))}>
+                <Toggle defaultPressed={getValues("categories")?.some(cat => cat.name === category.name)} size={"sm"} key={category.name} className="border rounded-full" onClick={() => handleSelectCategory(String(category.name))}>
                   {category.name}
                 </Toggle>
               ))}
@@ -198,19 +231,26 @@ export const FormCreateProduct = () => {
               </Toggle> */}
             </div>
             {fields.length > 0 && fields.map((field, index) => (
-              <input key={field.id} {...register(`categories.${index}.name`)} readOnly hidden />
+              <input key={field.id} className="text-black" {...register(`categories.${index}.name`)} readOnly hidden />
             ))}
           </div>
         }
 
         <Button
-          type="submit"
-          disabled={
-            Object.keys(errors).length !== 0 ||
-            isLoading
-          }
+        // disabled={
+        //   Object.keys(errors).length !== 0 ||
+        //   isLoading
+        // }
         >
           Salvar
+        </Button>
+
+        <Button
+          type="button"
+          variant={"outline"}
+          onClick={() => setEditModalIsOpen(false)}
+        >
+          Cancelar
         </Button>
       </form>
     </FormProvider>

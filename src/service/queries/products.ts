@@ -15,3 +15,19 @@ export const GET_PRODUCTS = gql`
     }
   }
 `;
+
+export const GET_PRODUCT = gql`
+  query Product($where: ProductWhereUniqueInput!) {
+    product(where: $where) {
+      id
+      name
+      description
+      inventory_quantity
+      categories {
+        category {
+          name
+        }
+      }
+    }
+  }
+`;
