@@ -19,7 +19,7 @@ export default function UpdateProduct({ id }: { id: string }) {
       <DialogTrigger asChild onClick={() => setEditModalIsOpen(true)}>
         <Pencil size={22} className="bg-yellow-500 p-1 text-white rounded-full" />
       </DialogTrigger>
-      <DialogContent withoutCloseButton>
+      <DialogContent withoutCloseButton className="max-w-[425px] md:max-w-[525px] lg:max-w-[825px]">
         <div className="flex flex-col gap-4">
           {
             loading ? <Skeleton className='h-96 w-full' /> :
