@@ -3,38 +3,38 @@ import React, { useState } from 'react'
 import { toast } from 'sonner'
 import { useMutation } from '@apollo/client'
 
-import { Product } from '../product'
-import { DELETE_PRODUCT } from '@/service/mutation/product'
 import { apolloClient } from '@/lib/apollo'
-import { GET_PRODUCTS } from '@/service/queries/products'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Sale } from '../sale'
+import { DELETE_SALE } from '@/service/mutation/sale'
+import { GET_SALES } from '@/service/queries/sale'
 
-export default function DeleteProduct({ product }: { product: Product }) {
+export default function DeleteSale({ sale }: { sale: Sale }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
 
-  const [deleteOneProduct] = useMutation(DELETE_PRODUCT)
+  const [deleteOneSale] = useMutation(DELETE_SALE)
 
-  async function handleDeleteProduct(id: string) {
+  async function handleDeleteSale(id: string) {
     try {
-      await deleteOneProduct({
+      await deleteOneSale({
         variables: { where: { id } },
-        update: (cache, { data: { deleteOneProduct } }) => {
-          const { products } = apolloClient.readQuery({ query: GET_PRODUCTS });
+        update: (cache, { data: { deleteOneSale } }) => {
+          const { sales } = apolloClient.readQuery({ query: GET_SALES });
 
           cache.writeQuery({
-            query: GET_PRODUCTS,
+            query: GET_SALES,
             data: {
-              products: products.filter((pdt: Product) => pdt.id !== deleteOneProduct.id),
+              sales: sales.filter((pdt: Sale) => pdt.id !== deleteOneSale.id),
             },
           });
         }
       })
-      toast("Produto deletado com sucesso...")
+      toast("Venda deletada com sucesso...")
     } catch (error) {
       console.log("error = ", error);
 
-      toast("Desculpe, mas não foi possível deletar o produto")
+      toast("Desculpe, mas não foi possível deletar a venda")
     } finally {
       setDeleteModalIsOpen(false)
     }
@@ -48,11 +48,11 @@ export default function DeleteProduct({ product }: { product: Product }) {
       <DialogContent>
         <div className="flex flex-col gap-4">
           <DialogHeader>
-            <DialogTitle><p>Você deseja deletar {product.name}?</p></DialogTitle>
+            <DialogTitle><p>Você deseja deletar {sale.id} do cliente {sale.client?.name}?</p></DialogTitle>
           </DialogHeader>
           <DialogFooter>
             <div className="flex gap-2">
-              <Button onClick={() => handleDeleteProduct(String(product.id))}>Deletar</Button>
+              <Button onClick={() => handleDeleteSale(String(sale.id))}>Deletar</Button>
               <Button onClick={() => setDeleteModalIsOpen(false)}>Cancelar</Button>
             </div>
           </DialogFooter>

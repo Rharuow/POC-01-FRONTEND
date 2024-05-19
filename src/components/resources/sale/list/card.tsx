@@ -4,6 +4,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 // import DeleteSale from "../delete";
 // import UpdateSale from "../update";
 import { Sale } from "../sale";
+import DeleteSale from "../delete";
 
 export const CardSale = ({ sale }: { sale: Sale }) => {
 
@@ -30,8 +31,8 @@ export const CardSale = ({ sale }: { sale: Sale }) => {
         <p>Total da venda: {sale.totalPrice}</p>
       </CardHeader>
       <div className="absolute top-1 right-1 flex gap-1">
-        {/* <DeleteSale sale={sale} />
-        <UpdateSale id={String(sale.id)} /> */}
+        <DeleteSale sale={sale} />
+        {/*<UpdateSale id={String(sale.id)} /> */}
       </div>
     </Card>
   );

@@ -102,9 +102,6 @@ export const FormCreateSale = () => {
   const clientIdWatch = useWatch({ control, name: 'clientId' })
 
   async function onSubmit(data: IFormCreateSale) {
-    console.log(data);
-    console.log(getValues("orders"));
-    console.log(getValues("totalPrice"));
     try {
       setIsLoading(true);
       const formattedData: SaleCreateInput = {
