@@ -8,7 +8,10 @@ export const GET_SALES = gql`
       client {
         id
         name
-        email
+        address {
+          delivery
+          billing
+        }
       }
       orders {
         id
@@ -17,6 +20,7 @@ export const GET_SALES = gql`
         product {
           id
           name
+          price
         }
       }
     }
@@ -24,15 +28,26 @@ export const GET_SALES = gql`
 `;
 
 export const GET_SALE = gql`
-  query Product($where: ProductWhereUniqueInput!) {
-    product(where: $where) {
+  query Sales($where: SaleWhereUniqueInput!) {
+    sale(where: $where) {
       id
-      name
-      description
-      inventory_quantity
-      categories {
-        category {
+      totalPrice
+      client {
+        id
+        name
+        address {
+          billing
+          delivery
+        }
+      }
+      orders {
+        id
+        amount
+        totalPrice
+        product {
+          id
           name
+          price
         }
       }
     }
