@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cpfMask } from "@/lib/mask/cpf";
 import { cnpjMask } from "@/lib/mask/cnpj";
 import { cpfIsValid } from "@/lib/validation/cpf";
-import { cn } from "@/lib/utils";
 import { cnpjIsValid } from "@/lib/validation/cnpj";
 import { useMutation } from "@apollo/client";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Client, IFormClient } from "../client";
 import { UPDATE_CLIENT } from "@/service/mutation/client";
 import { formClientSchema } from "../schemas";
@@ -67,17 +63,11 @@ export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalI
         {
           isLoading ? <Loading /> : <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
-
               <InputGroup label="Nome" name="name" />
-
               <InputGroup label="Email" name="email" />
-
             </div>
-
             <InputGroup label="Endereço  de cobrança" name="billing" />
-
             <InputGroup label="Endreço de entrega" name="delivery" />
-
             <Tabs defaultValue={typeDocument}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger
