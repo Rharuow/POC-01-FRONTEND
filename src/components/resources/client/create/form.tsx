@@ -18,40 +18,16 @@ import { useOpenCreateClientModalContext } from "../list";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { apolloClient } from "@/lib/apollo";
 import { CREATE_CLIENT } from "@/service/mutation/client";
-
-interface IFormCreateClient {
-  name: string;
-  email: string;
-  cpf: string;
-  cnpj: string;
-  billing: string;
-  delivery: string;
-}
-
-
-const schema = z.object({
-  name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
-  cpf: z.string(),
-  cnpj: z.string(),
-  email: z
-    .string({ required_error: "O email é obrigatório" })
-    .email("Este é um email inválido."),
-  billing: z.string().min(1, { message: "Endereço de cobrança inválido" }),
-  delivery: z.string().min(1, { message: "Endereço de entrega inválido" }),
-}).partial({
-  cnpj: true,
-  cpf: true,
-}).refine(
-  data => !!data.cpf || !!data.cnpj,
-  'Documento é obrigatório'
-);
+import Loading from "./loading";
+import { formClientSchema } from "../schemas";
+import { IFormClient } from "../client";
 
 export const FormCreateClient = () => {
   const [createClient] = useMutation(CREATE_CLIENT);
   const { setIsOpen } = useOpenCreateClientModalContext();
 
-  const methods = useForm<IFormCreateClient>({
-    resolver: zodResolver(schema),
+  const methods = useForm<IFormClient>({
+    resolver: zodResolver(formClientSchema),
     defaultValues: {
       cnpj: '',
       cpf: '',
@@ -70,9 +46,7 @@ export const FormCreateClient = () => {
     formState: { errors },
   } = methods;
 
-  async function onSubmit(data: IFormCreateClient) {
-    console.info(data);
-
+  async function onSubmit(data: IFormClient) {
     try {
       setIsLoading(true);
 
@@ -101,166 +75,154 @@ export const FormCreateClient = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Nome"
-                {...register("name")}
-                autoFocus={false}
-                className={cn({
-                  "border border-red-700": errors && errors.name,
-                })}
-              />
-              {errors && errors.name && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.name.message}
-                </span>
-              )}
-            </div>
-          )}
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Email"
-                {...register("email")}
-                className={cn({
-                  "border border-red-700": errors && errors.email,
-                })}
-              />
-              {errors && errors.email && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.email.message}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-        {isLoading ? (
-          <Skeleton className="w-full h-10 rounded-full" />
-        ) : (
-          <div className="flex flex-col">
-            <Input
-              label="Endreço de cobrança"
-              {...register("billing")}
-              className={cn({
-                "border border-red-700": errors && errors.billing,
-              })}
-            />
-            {errors && errors.billing && (
-              <span className="text-xs text-red-400 font-bold">
-                {errors.billing.message}
-              </span>
-            )}
-          </div>
-        )}
-        {isLoading ? (
-          <Skeleton className="w-full h-10 rounded-full" />
-        ) : (
-          <div className="flex flex-col">
-            <Input
-              label="Endreço de entrega"
-              {...register("delivery")}
-              className={cn({
-                "border border-red-700": errors && errors.delivery,
-              })}
-            />
-            {errors && errors.delivery && (
-              <span className="text-xs text-red-400 font-bold">
-                {errors.delivery.message}
-              </span>
-            )}
-          </div>
-        )}
-
-        <Tabs defaultValue={typeDocument}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger
-              value="cpf"
-              disabled={isLoading}
-              onClick={() => {
-                setCnpjIsInvalid(false);
-                setTypeDocument("cpf");
-              }}
-            >
-              CPF
-            </TabsTrigger>
-            <TabsTrigger
-              value="cnpj"
-              disabled={isLoading}
-              onClick={() => {
-                setCpfIsInvalid(false);
-                setTypeDocument("cnpj");
-              }}
-            >
-              CNPJ
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="cpf">
-            {isLoading ? (
-              <Skeleton className="w-full h-10 rounded-full" />
-            ) : (
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        {
+          isLoading ? <Loading /> : <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
               <div className="flex flex-col">
                 <Input
-                  label="CPF"
-                  inputMode="numeric"
-                  {...register("cpf", {
-                    onChange: (event) => {
-                      setValue("cpf", cpfMask(event.target.value));
-                    },
-                    onBlur: (event) => {
-                      setCpfIsInvalid(!cpfIsValid(event.target.value));
-                    },
-                  })}
+                  label="Nome"
+                  {...register("name")}
+                  autoFocus={false}
                   className={cn({
-                    "border border-red-700":
-                      (errors && errors.cpf) || cpfIsInvalid,
+                    "border border-red-700": errors && errors.name,
                   })}
                 />
-                {((errors && errors.cpf) || cpfIsInvalid) && (
+                {errors && errors.name && (
                   <span className="text-xs text-red-400 font-bold">
-                    {errors.cpf?.message || "Formato do CPF inválido"}
+                    {errors.name.message}
                   </span>
                 )}
               </div>
-            )}
-          </TabsContent>
-          <TabsContent value="cnpj">
-            {isLoading ? (
-              <Skeleton className="w-full h-10 rounded-full" />
-            ) : (
+
               <div className="flex flex-col">
                 <Input
-                  label="CNPJ"
-                  inputMode="numeric"
-                  {...register("cnpj", {
-                    onChange: (event) => {
-                      setCnpjIsInvalid(!cnpjIsValid(event.target.value));
-                      setValue("cnpj", cnpjMask(event.target.value));
-                    },
-                    onBlur: (event) => setCnpjIsInvalid(!cnpjIsValid(event.target.value)),
-                  })}
+                  label="Email"
+                  {...register("email")}
                   className={cn({
-                    "border border-red-700":
-                      (errors && errors.cnpj) || cnpjIsInvalid,
+                    "border border-red-700": errors && errors.email,
                   })}
                 />
-                {((errors && errors.cnpj) || cnpjIsInvalid) && (
+                {errors && errors.email && (
                   <span className="text-xs text-red-400 font-bold">
-                    {errors.cnpj?.message ||
-                      "Formato do CNPJ inválido"}
+                    {errors.email.message}
                   </span>
                 )}
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            </div>
 
+            <div className="flex flex-col">
+              <Input
+                label="Endreço de cobrança"
+                {...register("billing")}
+                className={cn({
+                  "border border-red-700": errors && errors.billing,
+                })}
+              />
+              {errors && errors.billing && (
+                <span className="text-xs text-red-400 font-bold">
+                  {errors.billing.message}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-col">
+              <Input
+                label="Endreço de entrega"
+                {...register("delivery")}
+                className={cn({
+                  "border border-red-700": errors && errors.delivery,
+                })}
+              />
+              {errors && errors.delivery && (
+                <span className="text-xs text-red-400 font-bold">
+                  {errors.delivery.message}
+                </span>
+              )}
+            </div>
+
+            <Tabs defaultValue={typeDocument}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger
+                  value="cpf"
+                  onClick={() => {
+                    setCnpjIsInvalid(false);
+                    setTypeDocument("cpf");
+                  }}
+                >
+                  CPF
+                </TabsTrigger>
+                <TabsTrigger
+                  value="cnpj"
+                  onClick={() => {
+                    setCpfIsInvalid(false);
+                    setTypeDocument("cnpj");
+                  }}
+                >
+                  CNPJ
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="cpf">
+                {isLoading ? (
+                  <Skeleton className="w-full h-10 rounded-full" />
+                ) : (
+                  <div className="flex flex-col">
+                    <Input
+                      label="CPF"
+                      inputMode="numeric"
+                      {...register("cpf", {
+                        onChange: (event) => {
+                          setValue("cpf", cpfMask(event.target.value));
+                        },
+                        onBlur: (event) => {
+                          setCpfIsInvalid(!cpfIsValid(event.target.value));
+                        },
+                      })}
+                      className={cn({
+                        "border border-red-700":
+                          (errors && errors.cpf) || cpfIsInvalid,
+                      })}
+                    />
+                    {((errors && errors.cpf) || cpfIsInvalid) && (
+                      <span className="text-xs text-red-400 font-bold">
+                        {errors.cpf?.message || "Formato do CPF inválido"}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent value="cnpj">
+                {isLoading ? (
+                  <Skeleton className="w-full h-10 rounded-full" />
+                ) : (
+                  <div className="flex flex-col">
+                    <Input
+                      label="CNPJ"
+                      inputMode="numeric"
+                      {...register("cnpj", {
+                        onChange: (event) => {
+                          setCnpjIsInvalid(!cnpjIsValid(event.target.value));
+                          setValue("cnpj", cnpjMask(event.target.value));
+                        },
+                        onBlur: (event) => setCnpjIsInvalid(!cnpjIsValid(event.target.value)),
+                      })}
+                      className={cn({
+                        "border border-red-700":
+                          (errors && errors.cnpj) || cnpjIsInvalid,
+                      })}
+                    />
+                    {((errors && errors.cnpj) || cnpjIsInvalid) && (
+                      <span className="text-xs text-red-400 font-bold">
+                        {errors.cnpj?.message ||
+                          "Formato do CNPJ inválido"}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+        }
         <Button
           type="submit"
           disabled={

@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Pencil } from 'lucide-react'
 
-import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { useQuery } from '@apollo/client'
 import { GET_CLIENT } from '@/service/queries/clients'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,7 +11,7 @@ export default function UpdateClient({ id }: { id: string }) {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false)
 
   const { loading, data } = useQuery(GET_CLIENT, {
-    variables: { where: { id } }
+    variables: { id }
   })
 
   return (
@@ -24,7 +23,7 @@ export default function UpdateClient({ id }: { id: string }) {
         <div className="flex flex-col gap-4">
           {
             loading ? <Skeleton className='h-96 w-full' /> :
-              <FormUpdateClient setEditModalIsOpen={setEditModalIsOpen} client={data?.getClient} />
+              data && data?.client && <FormUpdateClient setEditModalIsOpen={setEditModalIsOpen} client={data?.client} />
           }
         </div>
       </DialogContent>

@@ -8,3 +8,12 @@ export type Client = {
   document?: Document;
   address?: Address;
 };
+
+export interface IFormClient {
+  name: string;
+  email: string;
+  cpf: string;
+  cnpj: string;
+  billing: string;
+  delivery: string;
+}

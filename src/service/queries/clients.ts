@@ -19,8 +19,8 @@ export const GET_CLIENTS = gql`
 `;
 
 export const GET_CLIENT = gql`
-  query Client($clientId: String!) {
-    client(id: $clientId) {
+  query Client($id: String!) {
+    client(id: $id) {
       id
       name
       email
