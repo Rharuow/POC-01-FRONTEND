@@ -6,7 +6,6 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { Skeleton } from "@/components/ui/skeleton";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { useQuery } from "@apollo/client";
 import { CardClient } from "./card";
@@ -15,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { CreateClient } from "../create";
 import { Client } from "../client";
+import Loading from "./loading";
 
 const OpenCreateClientModalContext = createContext<{
   isOpen: boolean;
@@ -36,14 +36,7 @@ export const ListClient = () => {
     <Carousel className="w-full">
       <CarouselContent className="w-full">
         {loading
-          ? Array.from({ length: 4 }).map((_, index) => (
-            <CarouselItem
-              className="md:basis-1/2 lg:basis-1/4 flex justify-center"
-              key={index}
-            >
-              <Skeleton className="w-full h-20" />
-            </CarouselItem>
-          ))
+          ? <Loading />
           : data?.clients.map((client, _, self) => (
             <CarouselItem
               className={cn("md:basis-1/2", {

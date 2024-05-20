@@ -22,58 +22,40 @@ import { CREATE_CLIENT } from "@/service/mutation/client";
 interface IFormCreateClient {
   name: string;
   email: string;
-  documentation: string;
+  cpf: string;
+  cnpj: string;
   billing: string;
   delivery: string;
 }
 
-type ClientCreateInput = {
-  data: {
-    address: {
-      connectOrCreate: {
-        create: {
-          billing: string;
-          delivery: string;
-        };
-        where: {
-          billing: string;
-          delivery: string;
-        };
-      }
-    };
-    document: {
-      connectOrCreate: {
-        create: {
-          cnpj?: string;
-          cpf?: string;
-        };
-        where: {
-          cnpj?: string;
-          cpf?: string;
-        };
-      }
-    };
-    email: string;
-    name: string;
-  };
-};
 
 const schema = z.object({
   name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
-  documentation: z.string().min(1, { message: "Documento inválido" }),
+  cpf: z.string(),
+  cnpj: z.string(),
   email: z
     .string({ required_error: "O email é obrigatório" })
     .email("Este é um email inválido."),
   billing: z.string().min(1, { message: "Endereço de cobrança inválido" }),
   delivery: z.string().min(1, { message: "Endereço de entrega inválido" }),
-});
+}).partial({
+  cnpj: true,
+  cpf: true,
+}).refine(
+  data => !!data.cpf || !!data.cnpj,
+  'Documento é obrigatório'
+);
 
 export const FormCreateClient = () => {
-  const [createOneClient] = useMutation(CREATE_CLIENT);
+  const [createClient] = useMutation(CREATE_CLIENT);
   const { setIsOpen } = useOpenCreateClientModalContext();
 
   const methods = useForm<IFormCreateClient>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      cnpj: '',
+      cpf: '',
+    }
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -89,50 +71,19 @@ export const FormCreateClient = () => {
   } = methods;
 
   async function onSubmit(data: IFormCreateClient) {
+    console.info(data);
+
     try {
       setIsLoading(true);
-      const { documentation, billing, delivery, ...dataSpread } = data;
-      const formattedData: ClientCreateInput = {
-        data: {
-          ...dataSpread,
-          document: {
-            connectOrCreate: {
-              create: {
-                ...(typeDocument === "cnpj"
-                  ? { cnpj: documentation }
-                  : { cpf: documentation }),
-              },
-              where: {
-                ...(typeDocument === "cnpj"
-                  ? { cnpj: documentation }
-                  : { cpf: documentation }),
-              }
-            },
-          },
-          address: {
-            connectOrCreate: {
-              create: {
-                billing,
-                delivery,
-              },
-              where: {
-                billing,
-                delivery,
-              }
-            },
-          },
-        },
-      };
 
-      await createOneClient({
-        variables: formattedData,
-        update: (cache, { data: { createOneClient } }) => {
+      await createClient({
+        variables: data,
+        update: (cache, { data: { createClient } }) => {
           const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
-
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              clients: [...clients, createOneClient],
+              clients: [...clients, createClient],
             },
           });
         },
@@ -140,12 +91,13 @@ export const FormCreateClient = () => {
       toast("Cliente criado com sucesso");
       setIsOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast("Desculpe, algo está errado!");
     } finally {
       setIsLoading(false);
     }
   }
+
 
   return (
     <FormProvider {...methods}>
@@ -232,7 +184,6 @@ export const FormCreateClient = () => {
               value="cpf"
               disabled={isLoading}
               onClick={() => {
-                setValue("documentation", "");
                 setCnpjIsInvalid(false);
                 setTypeDocument("cpf");
               }}
@@ -243,7 +194,6 @@ export const FormCreateClient = () => {
               value="cnpj"
               disabled={isLoading}
               onClick={() => {
-                setValue("documentation", "");
                 setCpfIsInvalid(false);
                 setTypeDocument("cnpj");
               }}
@@ -259,9 +209,9 @@ export const FormCreateClient = () => {
                 <Input
                   label="CPF"
                   inputMode="numeric"
-                  {...register("documentation", {
+                  {...register("cpf", {
                     onChange: (event) => {
-                      setValue("documentation", cpfMask(event.target.value));
+                      setValue("cpf", cpfMask(event.target.value));
                     },
                     onBlur: (event) => {
                       setCpfIsInvalid(!cpfIsValid(event.target.value));
@@ -269,12 +219,12 @@ export const FormCreateClient = () => {
                   })}
                   className={cn({
                     "border border-red-700":
-                      (errors && errors.documentation) || cpfIsInvalid,
+                      (errors && errors.cpf) || cpfIsInvalid,
                   })}
                 />
-                {((errors && errors.documentation) || cpfIsInvalid) && (
+                {((errors && errors.cpf) || cpfIsInvalid) && (
                   <span className="text-xs text-red-400 font-bold">
-                    {errors.documentation?.message || "Formato do CPF inválido"}
+                    {errors.cpf?.message || "Formato do CPF inválido"}
                   </span>
                 )}
               </div>
@@ -288,24 +238,21 @@ export const FormCreateClient = () => {
                 <Input
                   label="CNPJ"
                   inputMode="numeric"
-                  {...register("documentation", {
+                  {...register("cnpj", {
                     onChange: (event) => {
                       setCnpjIsInvalid(!cnpjIsValid(event.target.value));
-                      setValue("documentation", cnpjMask(event.target.value));
+                      setValue("cnpj", cnpjMask(event.target.value));
                     },
-                    onBlur: (event) => {
-                      console.log(cnpjIsValid(event.target.value));
-                      setCnpjIsInvalid(!cnpjIsValid(event.target.value));
-                    },
+                    onBlur: (event) => setCnpjIsInvalid(!cnpjIsValid(event.target.value)),
                   })}
                   className={cn({
                     "border border-red-700":
-                      (errors && errors.documentation) || cnpjIsInvalid,
+                      (errors && errors.cnpj) || cnpjIsInvalid,
                   })}
                 />
-                {((errors && errors.documentation) || cnpjIsInvalid) && (
+                {((errors && errors.cnpj) || cnpjIsInvalid) && (
                   <span className="text-xs text-red-400 font-bold">
-                    {errors.documentation?.message ||
+                    {errors.cnpj?.message ||
                       "Formato do CNPJ inválido"}
                   </span>
                 )}

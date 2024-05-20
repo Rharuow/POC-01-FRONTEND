@@ -1,8 +1,22 @@
 import { gql } from "@apollo/client";
 
 export const CREATE_CLIENT = gql`
-  mutation CreateOneClient($data: ClientCreateInput!) {
-    createOneClient(data: $data) {
+  mutation CreateClient(
+    $cnpj: String!
+    $cpf: String!
+    $delivery: String!
+    $billing: String!
+    $email: String!
+    $name: String!
+  ) {
+    createClient(
+      cnpj: $cnpj
+      cpf: $cpf
+      delivery: $delivery
+      billing: $billing
+      email: $email
+      name: $name
+    ) {
       id
       name
       email
@@ -27,7 +41,10 @@ export const DELETE_CLIENT = gql`
 `;
 
 export const UPDATE_CLIENT = gql`
-  mutation UpdateOneClient($data: ClientUpdateInput!, $where: ClientWhereUniqueInput!) {
+  mutation UpdateOneClient(
+    $data: ClientUpdateInput!
+    $where: ClientWhereUniqueInput!
+  ) {
     updateOneClient(data: $data, where: $where) {
       id
       name
@@ -41,5 +58,5 @@ export const UPDATE_CLIENT = gql`
         cnpj
       }
     }
-}
+  }
 `;

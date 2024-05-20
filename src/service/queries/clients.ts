@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_CLIENTS = gql`
-  query Clients {
+  query GetClients {
     clients {
       id
       name
@@ -19,8 +19,8 @@ export const GET_CLIENTS = gql`
 `;
 
 export const GET_CLIENT = gql`
-  query Client($where: ClientWhereUniqueInput!) {
-    getClient(where: $where) {
+  query Client($clientId: String!) {
+    client(id: $clientId) {
       id
       name
       email
