@@ -19,12 +19,14 @@ export default function DeleteClient({ client }: { client: Client }) {
       await deleteClient({
         variables: { id },
         update: (cache) => {
-          const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
+          const data = apolloClient.readQuery({ query: GET_CLIENTS });
+
+          console.log(data);
 
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              clients: clients.filter((clt: Client) => clt.id !== client.id),
+              getClients: data.getClients.filter((clt: Client) => clt.id !== client.id),
             },
           });
         }

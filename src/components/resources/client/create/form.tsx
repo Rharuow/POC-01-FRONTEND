@@ -49,11 +49,15 @@ export const FormCreateClient = () => {
       await createClient({
         variables: data,
         update: (cache, { data: { createClient } }) => {
-          const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
+          const data = apolloClient.readQuery({ query: GET_CLIENTS });
+
+          console.log(createClient);
+          console.log(data);
+
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              clients: [...clients, createClient],
+              getClients: [...data.getClients, createClient],
             },
           });
         },

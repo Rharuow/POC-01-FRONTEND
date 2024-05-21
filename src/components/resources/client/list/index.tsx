@@ -28,7 +28,7 @@ export const useOpenCreateClientModalContext = () =>
   useContext(OpenCreateClientModalContext);
 
 export const ListClient = () => {
-  const { data, loading } = useQuery<{ clients: Array<Client> }>(GET_CLIENTS);
+  const { data, loading } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS);
 
   const [isOpenCreateClientModal, setIsOpenCreateClientModal] = useState(false);
 
@@ -37,7 +37,7 @@ export const ListClient = () => {
       <CarouselContent className="w-full">
         {loading
           ? <Loading />
-          : data?.clients.map((client, _, self) => (
+          : data?.getClients.map((client, _, self) => (
             <CarouselItem
               className={cn("md:basis-1/2", {
                 "lg:basis-1/4": self.length >= 4,
@@ -51,12 +51,12 @@ export const ListClient = () => {
           ))}
         <CarouselItem
           className={cn({
-            "lg:basis-auto flex justify-center grow": data?.clients.length === 0,
-            "md:basis-1/2 lg:basis-1/4": data?.clients && data?.clients.length >= 4,
-            "md:basis-1/2 lg:basis-1/3": data?.clients.length === 3,
-            "md:basis-1/2 lg:basis-1/2": data?.clients && data?.clients.length <= 2,
+            "lg:basis-auto flex justify-center grow": data?.getClients.length === 0,
+            "md:basis-1/2 lg:basis-1/4": data?.getClients && data?.getClients.length >= 4,
+            "md:basis-1/2 lg:basis-1/3": data?.getClients.length === 3,
+            "md:basis-1/2 lg:basis-1/2": data?.getClients && data?.getClients.length <= 2,
           })}
-          key={data?.clients.length}
+          key={data?.getClients.length}
         >
           <OpenCreateClientModalContext.Provider
             value={{
@@ -73,13 +73,13 @@ export const ListClient = () => {
                   className={cn(
                     "h-full w-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
                     {
-                      "min-h-20": data?.clients.length === 0,
+                      "min-h-20": data?.getClients.length === 0,
                     }
                   )}
                 >
                   <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
                     <PlusCircle />
-                    {data?.clients.length === 0 ? (
+                    {data?.getClients.length === 0 ? (
                       <p>Nenhum cliente Cadastrado</p>
                     ) : (
                       <p>Adicionar Cliente</p>

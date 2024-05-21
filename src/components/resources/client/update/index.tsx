@@ -6,11 +6,12 @@ import { useQuery } from '@apollo/client'
 import { GET_CLIENT } from '@/service/queries/clients'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FormUpdateClient } from './form'
+import { Client } from '../client'
 
 export default function UpdateClient({ id }: { id: string }) {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false)
 
-  const { loading, data } = useQuery(GET_CLIENT, {
+  const { loading, data } = useQuery<{ getClient: Client }>(GET_CLIENT, {
     variables: { id }
   })
 
@@ -23,7 +24,7 @@ export default function UpdateClient({ id }: { id: string }) {
         <div className="flex flex-col gap-4">
           {
             loading ? <Skeleton className='h-96 w-full' /> :
-              data && data?.client && <FormUpdateClient setEditModalIsOpen={setEditModalIsOpen} client={data?.client} />
+              data && data?.getClient && <FormUpdateClient setEditModalIsOpen={setEditModalIsOpen} client={data?.getClient} />
           }
         </div>
       </DialogContent>

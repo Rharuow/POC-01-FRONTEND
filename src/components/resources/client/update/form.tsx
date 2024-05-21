@@ -46,21 +46,17 @@ export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalI
   } = methods;
 
   async function onSubmit(data: IFormClient) {
-
-    console.log({ ...data, id: client.id });
-
-
     try {
       setIsLoading(true);
 
       await updateClient({
         variables: { ...data, id: client.id },
         update: (cache, { data: { updateClient } }) => {
-          const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
+          const { getClients } = apolloClient.readQuery({ query: GET_CLIENTS });
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              clients: [...clients.filter((clt: Client) => clt.id !== client.id), updateClient],
+              getClients: [...getClients.filter((clt: Client) => clt.id !== client.id), updateClient],
             },
           });
         },
