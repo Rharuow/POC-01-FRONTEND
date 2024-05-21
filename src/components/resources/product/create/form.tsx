@@ -20,6 +20,7 @@ import { Category } from "../../category/category";
 import { formProdcutSchema } from "../schemas";
 import { IFormCreateProduct, ProcutCreateInput } from "../product";
 import InputGroup from "@/components/ui/inputGroup";
+import Loading from "./loading";
 
 export const FormCreateProduct = () => {
   const [createProduct] = useMutation(CREATE_PRODUCT);
@@ -47,8 +48,6 @@ export const FormCreateProduct = () => {
   });
 
   async function onSubmit(data: IFormCreateProduct) {
-    console.log("data = ", data);
-
     try {
       setIsLoading(true);
       const formattedData: ProcutCreateInput = {
@@ -60,8 +59,6 @@ export const FormCreateProduct = () => {
           categories: data.categories.map(category => (category.name))
         })
       };
-
-      console.log("formattedData = ", formattedData);
 
       await createProduct({
         variables: formattedData,
@@ -94,61 +91,64 @@ export const FormCreateProduct = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
-            <InputGroup label="Nome" name="name" />
-            <InputGroup label="Valor" name="price" inputMode="numeric" step={0.01} min={0} type="number" />
-            <InputGroup label="Quantidade em estoque" name="inventory_quantity" inputMode="numeric" min={0} step={1} type="number" />
-          </div>
+      {
+        isLoading ? <Loading /> :
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
+                <InputGroup label="Nome" name="name" />
+                <InputGroup label="Valor" name="price" inputMode="numeric" step={0.01} min={0} type="number" />
+                <InputGroup label="Quantidade em estoque" name="inventory_quantity" inputMode="numeric" min={0} step={1} type="number" />
+              </div>
 
-          <div className="flex flex-col">
-            <Textarea
-              label="Descrição"
-              {...register("description")}
-              className={cn({
-                "border border-red-700": errors && errors.description,
-              })}
-            />
-            {errors && errors.description && (
-              <span className="text-xs text-red-400 font-bold">
-                {errors.description.message}
-              </span>
-            )}
-          </div>
+              <div className="flex flex-col">
+                <Textarea
+                  label="Descrição"
+                  {...register("description")}
+                  className={cn({
+                    "border border-red-700": errors && errors.description,
+                  })}
+                />
+                {errors && errors.description && (
+                  <span className="text-xs text-red-400 font-bold">
+                    {errors.description.message}
+                  </span>
+                )}
+              </div>
 
 
-          <div className="flex flex-col gap-2">
-            <p>Categorias</p>
-            <div className="flex flex-wrap gap-2">
-              {categoryData && categoryData.categories.length > 0 && categoryData.categories.map((category) => (
-                <Toggle size={"sm"} key={category.name} className="border rounded-full" onClick={() => handleSelectCategory(String(category.name))}>
-                  {category.name}
-                </Toggle>
-              ))}
-              {/* <Toggle
+              <div className="flex flex-col gap-2">
+                <p>Categorias</p>
+                <div className="flex flex-wrap gap-2">
+                  {categoryData && categoryData.categories.length > 0 && categoryData.categories.map((category) => (
+                    <Toggle size={"sm"} key={category.name} className="border rounded-full" onClick={() => handleSelectCategory(String(category.name))}>
+                      {category.name}
+                    </Toggle>
+                  ))}
+                  {/* <Toggle
                 size={"sm"}
                 className="border border-green-500 text-green-500 rounded-full transition duration-300 hover:text-green-700 hover:border-green-700"
               >
                 + Categoria
               </Toggle> */}
+                </div>
+                {fields.length > 0 && fields.map((field, index) => (
+                  <input key={field.id} {...register(`categories.${index}.name`)} readOnly hidden />
+                ))}
+              </div>
             </div>
-            {fields.length > 0 && fields.map((field, index) => (
-              <input key={field.id} {...register(`categories.${index}.name`)} readOnly hidden />
-            ))}
-          </div>
-        </div>
 
-        <Button
-          type="submit"
-          disabled={
-            Object.keys(errors).length !== 0 ||
-            isLoading
-          }
-        >
-          Salvar
-        </Button>
-      </form>
+            <Button
+              type="submit"
+              disabled={
+                Object.keys(errors).length !== 0 ||
+                isLoading
+              }
+            >
+              Salvar
+            </Button>
+          </form>
+      }
     </FormProvider>
   );
 };

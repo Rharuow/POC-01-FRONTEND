@@ -13,19 +13,19 @@ import { Button } from '@/components/ui/button'
 export default function DeleteProduct({ product }: { product: Product }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
 
-  const [deleteOneProduct] = useMutation(DELETE_PRODUCT)
+  const [deleteProduct] = useMutation(DELETE_PRODUCT)
 
   async function handleDeleteProduct(id: string) {
     try {
-      await deleteOneProduct({
-        variables: { where: { id } },
-        update: (cache, { data: { deleteOneProduct } }) => {
-          const { products } = apolloClient.readQuery({ query: GET_PRODUCTS });
+      await deleteProduct({
+        variables: { id },
+        update: (cache) => {
+          const data = apolloClient.readQuery({ query: GET_PRODUCTS });
 
           cache.writeQuery({
             query: GET_PRODUCTS,
             data: {
-              products: products.filter((pdt: Product) => pdt.id !== deleteOneProduct.id),
+              getProducts: data.getProducts.filter((pdt: Product) => pdt.id !== product.id),
             },
           });
         }
