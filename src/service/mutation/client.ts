@@ -33,10 +33,8 @@ export const CREATE_CLIENT = gql`
 `;
 
 export const DELETE_CLIENT = gql`
-  mutation DeleteOneClient($where: ClientWhereUniqueInput!) {
-    deleteOneClient(where: $where) {
-      id
-    }
+  mutation DeleteClient($id: String!) {
+    deleteClient(id: $id)
   }
 `;
 

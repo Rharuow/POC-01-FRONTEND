@@ -12,19 +12,19 @@ import { DELETE_CLIENT } from '@/service/mutation/client'
 export default function DeleteClient({ client }: { client: Client }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
 
-  const [deleteOneClient] = useMutation(DELETE_CLIENT)
+  const [deleteClient] = useMutation(DELETE_CLIENT)
 
   async function handleDeleteClient(id: string) {
     try {
-      await deleteOneClient({
-        variables: { where: { id } },
-        update: (cache, { data: { deleteOneClient } }) => {
+      await deleteClient({
+        variables: { id },
+        update: (cache) => {
           const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
 
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              clients: clients.filter((client: Client) => client.id !== deleteOneClient.id),
+              clients: clients.filter((clt: Client) => clt.id !== client.id),
             },
           });
         }
