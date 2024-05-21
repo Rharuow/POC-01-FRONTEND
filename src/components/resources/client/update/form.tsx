@@ -15,17 +15,19 @@ import { UPDATE_CLIENT } from "@/service/mutation/client";
 import { formClientSchema } from "../schemas";
 import Loading from "./loading";
 import InputGroup from "@/components/ui/inputGroup";
+import { apolloClient } from "@/lib/apollo";
+import { GET_CLIENTS } from "@/service/queries/clients";
 
 export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>; client: Client }) => {
-  const [updateOneClient] = useMutation(UPDATE_CLIENT);
+  const [updateClient] = useMutation(UPDATE_CLIENT);
 
   const methods = useForm<IFormClient>({
     resolver: zodResolver(formClientSchema),
     defaultValues: {
       billing: client.address?.billing,
       delivery: client.address?.delivery,
-      cnpj: client.document?.cnpj,
-      cpf: client.document?.cpf,
+      cnpj: client.document?.cnpj ? client.document?.cnpj : "",
+      cpf: client.document?.cpf ? client.document?.cpf : "",
       email: client.email,
       name: client.name
     }
@@ -44,8 +46,25 @@ export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalI
   } = methods;
 
   async function onSubmit(data: IFormClient) {
+
+    console.log({ ...data, id: client.id });
+
+
     try {
       setIsLoading(true);
+
+      await updateClient({
+        variables: { ...data, id: client.id },
+        update: (cache, { data: { updateClient } }) => {
+          const { clients } = apolloClient.readQuery({ query: GET_CLIENTS });
+          cache.writeQuery({
+            query: GET_CLIENTS,
+            data: {
+              clients: [...clients.filter((clt: Client) => clt.id !== client.id), updateClient],
+            },
+          });
+        },
+      })
 
       toast("Cliente atualizado com sucesso");
       setEditModalIsOpen(false);

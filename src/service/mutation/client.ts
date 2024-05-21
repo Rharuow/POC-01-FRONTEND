@@ -41,11 +41,24 @@ export const DELETE_CLIENT = gql`
 `;
 
 export const UPDATE_CLIENT = gql`
-  mutation UpdateOneClient(
-    $data: ClientUpdateInput!
-    $where: ClientWhereUniqueInput!
+  mutation UpdateClient(
+    $cnpj: String!
+    $cpf: String!
+    $delivery: String!
+    $billing: String!
+    $email: String!
+    $name: String!
+    $id: String!
   ) {
-    updateOneClient(data: $data, where: $where) {
+    updateClient(
+      cnpj: $cnpj
+      cpf: $cpf
+      delivery: $delivery
+      billing: $billing
+      email: $email
+      name: $name
+      id: $id
+    ) {
       id
       name
       email
@@ -54,8 +67,8 @@ export const UPDATE_CLIENT = gql`
         delivery
       }
       document {
-        cpf
         cnpj
+        cpf
       }
     }
   }
