@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
 import { apolloClient } from "@/lib/apollo";
 import { CREATE_PRODUCT } from "@/service/mutation/product";
 import { useOpenCreateProductModalContext } from "../list";
@@ -18,7 +15,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { GET_CATEGORIES } from "@/service/queries/category";
 import { Category } from "../../category/category";
 import { formProdcutSchema } from "../schemas";
-import { IFormCreateProduct, ProcutCreateInput } from "../product";
+import { IFormProduct, ProductInput } from "../product";
 import InputGroup from "@/components/ui/inputGroup";
 import Loading from "./loading";
 
@@ -28,7 +25,7 @@ export const FormCreateProduct = () => {
 
   const { setIsOpen } = useOpenCreateProductModalContext();
 
-  const methods = useForm<IFormCreateProduct>({
+  const methods = useForm<IFormProduct>({
     resolver: zodResolver(formProdcutSchema),
   });
 
@@ -47,10 +44,10 @@ export const FormCreateProduct = () => {
     name: "categories", // unique name for your Field Array
   });
 
-  async function onSubmit(data: IFormCreateProduct) {
+  async function onSubmit(data: IFormProduct) {
     try {
       setIsLoading(true);
-      const formattedData: ProcutCreateInput = {
+      const formattedData: ProductInput = {
         name: data.name,
         price: parseFloat(String(getValues("price"))),
         description: data.description,
@@ -115,8 +112,6 @@ export const FormCreateProduct = () => {
                   </span>
                 )}
               </div>
-
-
               <div className="flex flex-col gap-2">
                 <p>Categorias</p>
                 <div className="flex flex-wrap gap-2">
@@ -125,19 +120,12 @@ export const FormCreateProduct = () => {
                       {category.name}
                     </Toggle>
                   ))}
-                  {/* <Toggle
-                size={"sm"}
-                className="border border-green-500 text-green-500 rounded-full transition duration-300 hover:text-green-700 hover:border-green-700"
-              >
-                + Categoria
-              </Toggle> */}
                 </div>
                 {fields.length > 0 && fields.map((field, index) => (
                   <input key={field.id} {...register(`categories.${index}.name`)} readOnly hidden />
                 ))}
               </div>
             </div>
-
             <Button
               type="submit"
               disabled={

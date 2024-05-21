@@ -11,7 +11,7 @@ export default function UpdateProduct({ id }: { id: string }) {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false)
 
   const { loading, data } = useQuery(GET_PRODUCT, {
-    variables: { where: { id } }
+    variables: { id }
   })
 
   return (
@@ -23,7 +23,7 @@ export default function UpdateProduct({ id }: { id: string }) {
         <div className="flex flex-col gap-4">
           {
             loading ? <Skeleton className='h-96 w-full' /> :
-              <FormUpdateProduct setEditModalIsOpen={setEditModalIsOpen} product={data?.product} />
+              <FormUpdateProduct setEditModalIsOpen={setEditModalIsOpen} product={data?.getProduct} />
           }
         </div>
       </DialogContent>

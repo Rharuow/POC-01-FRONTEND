@@ -12,15 +12,15 @@ export type Product = {
   orders?: Array<Order>;
 };
 
-export type IFormCreateProduct = {
+export type IFormProduct = {
   name: string;
   description: string;
-  price: number;
-  inventory_quantity: number;
+  price: number | string;
+  inventory_quantity: number | string;
   categories: Array<{ name: string }>;
 };
 
-export type ProcutCreateInput = {
+export type ProductInput = {
   name: string;
   description: string;
   price: number;

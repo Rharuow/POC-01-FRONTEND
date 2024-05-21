@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@apollo/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apolloClient } from "@/lib/apollo";
-import { Product } from "../product";
+import { IFormProduct, Product, ProductInput } from "../product";
 import { UPDATE_PRODUCT } from "@/service/mutation/product";
 import { GET_PRODUCTS } from "@/service/queries/products";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,46 +18,21 @@ import { GET_CATEGORIES } from "@/service/queries/category";
 import { Category } from "../../category/category";
 import { Toggle } from "@/components/ui/toggle";
 import { arraysAreIdentical } from "@/lib/validation/compareTwoArrays";
-
-interface IFormUpdateProduct {
-  name: string;
-  description: string;
-  price: number;
-  inventory_quantity: number;
-  categories?: Array<{ name: string }>
-}
-
-type ProductUpdateInput = {
-  data: {
-    name: { set: string };
-    price: { set: number };
-    description: { set: string };
-    inventory_quantity: { set: number };
-    categories?: {
-      set: Array<{ categoryName: { equals: string } }>
-    }
-  };
-  where: {
-    id: string
-  }
-};
-
-const schema = z.object({
-  name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
-  description: z.string().min(10, { message: "Pelo menos 10 caracteres" }),
-});
+import Loading from "./loading";
+import InputGroup from "@/components/ui/inputGroup";
+import { formProdcutSchema } from "../schemas";
 
 export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>; product: Product }) => {
-  const [updateOneProduct] = useMutation(UPDATE_PRODUCT);
+  const [updateProduct] = useMutation(UPDATE_PRODUCT);
   const { data: categoryData } = useQuery<{ categories: Array<Category> }>(GET_CATEGORIES)
 
-  const methods = useForm<IFormUpdateProduct>({
-    resolver: zodResolver(schema),
+  const methods = useForm<IFormProduct>({
+    resolver: zodResolver(formProdcutSchema),
     defaultValues: {
       name: product.name,
       description: product.description,
-      price: product.price,
-      inventory_quantity: product.inventory_quantity,
+      price: String(product.price),
+      inventory_quantity: String(product.inventory_quantity),
       categories: product.categories?.map(cat => ({ name: cat.category.name }))
     }
   });
@@ -73,63 +48,29 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
   } = methods;
 
 
-  async function onSubmit(data: IFormUpdateProduct) {
+  async function onSubmit(data: IFormProduct) {
     try {
       setIsLoading(true);
-      const { name, description } = data;
-      const formattedData: ProductUpdateInput = {
-        data: {
-          name: { set: name },
-          description: { set: description },
-          price: {
-            set: parseFloat(String(getValues("price")))
-          },
-          inventory_quantity: { set: getValues("inventory_quantity") },
-        },
-        where: {
-          id: String(product.id)
-        }
+      const { name, description, price, inventory_quantity, categories } = data;
+      const formattedData: ProductInput & { id: string } = {
+        id: String(product.id),
+        name,
+        description,
+        price: parseFloat(String(price)),
+        inventory_quantity: Number(inventory_quantity),
+        categories: categories.map(category => category.name)
+
       };
 
-      // If some categories forms are different of the product's categories 
-      if (!arraysAreIdentical(product.categories?.map(category => ({ name: category.category.name })), getValues("categories")?.map(category => ({ name: category.name })))) {
-        await updateOneProduct({
-          variables: {
-            data: {
-              categories: {
-                deleteMany: {
-                  productId: { equals: product.id }
-                }
-              }
-            },
-            where: { id: product.id }
-          },
-        });
-
-        await updateOneProduct({
-          variables: {
-            data: {
-              categories: {
-                createMany: {
-                  data: getValues("categories")?.map(category => ({ categoryName: category.name })),
-                  skipDuplicates: true
-                }
-              }
-            },
-            where: { id: product.id }
-          },
-        });
-      }
-
-      await updateOneProduct({
+      await updateProduct({
         variables: formattedData,
-        update: (cache, { data: { updateOneProduct } }) => {
-          const { products } = apolloClient.readQuery({ query: GET_PRODUCTS });
+        update: (cache, { data: { updateProduct } }) => {
+          const { getProducts } = apolloClient.readQuery({ query: GET_PRODUCTS });
 
           cache.writeQuery({
             query: GET_PRODUCTS,
             data: {
-              products: [...products.filter((pdt: Product) => pdt.id !== product.id), updateOneProduct],
+              getProducts: [...getProducts.filter((pdt: Product) => pdt.id !== product.id), updateProduct],
             },
           });
         },
@@ -157,128 +98,63 @@ export const FormUpdateProduct = ({ setEditModalIsOpen, product }: { setEditModa
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
+      {
+        isLoading ?
+          <Loading /> :
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
+              <InputGroup label="Nome" name="name" />
+              <InputGroup label="Valor" name="price" inputMode="numeric" step={0.01} min={0} type="number" />
+              <InputGroup label="Quantidade em estoque" name="inventory_quantity" inputMode="numeric" min={0} step={1} type="number" />
+            </div>
             <div className="flex flex-col">
-              <Input
-                label="Nome"
-                {...register("name")}
-                autoFocus={false}
+              <Textarea
+                label="Descrição"
+                {...register("description")}
                 className={cn({
-                  "border border-red-700": errors && errors.name,
+                  "border border-red-700": errors && errors.description,
                 })}
               />
-              {errors && errors.name && (
+              {errors && errors.description && (
                 <span className="text-xs text-red-400 font-bold">
-                  {errors.name.message}
+                  {errors.description.message}
                 </span>
               )}
             </div>
-          )}
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Valor"
-                inputMode="numeric"
-                step={0.01}
-                {...register("price")}
-                className={cn({
-                  "border border-red-700": errors && errors.price,
-                })}
-                type="number"
-              />
-              {errors && errors.price && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.price.message}
-                </span>
-              )}
-            </div>
-          )}
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Quantidade em estoque"
-                inputMode="numeric"
-                {...register("inventory_quantity")}
-                className={cn({
-                  "border border-red-700": errors && errors.inventory_quantity,
-                })}
-                type="number"
-              />
-              {errors && errors.inventory_quantity && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.inventory_quantity.message}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-        {isLoading ? (
-          <Skeleton className="w-full h-10 rounded-full" />
-        ) : (
-          <div className="flex flex-col">
-            <Textarea
-              label="Descrição"
-              {...register("description")}
-              className={cn({
-                "border border-red-700": errors && errors.description,
-              })}
-            />
-            {errors && errors.description && (
-              <span className="text-xs text-red-400 font-bold">
-                {errors.description.message}
-              </span>
-            )}
-          </div>
-        )}
-        {isLoading ? (
-          <Skeleton className="w-full h-10 rounded-full" />
-        ) :
-          <div className="flex flex-col gap-2">
-            <p>Categorias</p>
-            <div className="flex flex-wrap gap-2">
-              {categoryData && categoryData.categories.length > 0 && categoryData.categories.map((category) => (
-                <Toggle defaultPressed={getValues("categories")?.some(cat => cat.name === category.name)} size={"sm"} key={category.name} className="border rounded-full" onClick={() => handleSelectCategory(String(category.name))}>
-                  {category.name}
-                </Toggle>
+
+            <div className="flex flex-col gap-2">
+              <p>Categorias</p>
+              <div className="flex flex-wrap gap-2">
+                {categoryData && categoryData.categories.length > 0 && categoryData.categories.map((category) => (
+                  <Toggle defaultPressed={getValues("categories")?.some(cat => cat.name === category.name)} size={"sm"} key={category.name} className="border rounded-full" onClick={() => handleSelectCategory(String(category.name))}>
+                    {category.name}
+                  </Toggle>
+                ))}
+
+              </div>
+              {fields.length > 0 && fields.map((field, index) => (
+                <input key={field.id} className="text-black" {...register(`categories.${index}.name`)} readOnly hidden />
               ))}
-              {/* <Toggle
-                size={"sm"}
-                className="border border-green-500 text-green-500 rounded-full transition duration-300 hover:text-green-700 hover:border-green-700"
-              >
-                + Categoria
-              </Toggle> */}
             </div>
-            {fields.length > 0 && fields.map((field, index) => (
-              <input key={field.id} className="text-black" {...register(`categories.${index}.name`)} readOnly hidden />
-            ))}
-          </div>
-        }
 
-        <Button
-          disabled={
-            Object.keys(errors).length !== 0 ||
-            isLoading
-          }
-        >
-          Salvar
-        </Button>
+            <Button
+              disabled={
+                Object.keys(errors).length !== 0 ||
+                isLoading
+              }
+            >
+              Salvar
+            </Button>
 
-        <Button
-          type="button"
-          variant={"outline"}
-          onClick={() => setEditModalIsOpen(false)}
-        >
-          Cancelar
-        </Button>
-      </form>
+            <Button
+              type="button"
+              variant={"outline"}
+              onClick={() => setEditModalIsOpen(false)}
+            >
+              Cancelar
+            </Button>
+          </form>
+      }
     </FormProvider>
   );
 };

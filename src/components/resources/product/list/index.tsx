@@ -15,6 +15,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Product } from "../product";
 import { GET_PRODUCTS } from "@/service/queries/products";
 import { CreateProduct } from "../create";
+import Loading from "./loading";
 
 const OpenCreateProductModalContext = createContext<{
   isOpen: boolean;
@@ -36,14 +37,7 @@ export const ListProduct = () => {
     <Carousel className="w-full">
       <CarouselContent className="w-full">
         {loading
-          ? Array.from({ length: 4 }).map((_, index) => (
-            <CarouselItem
-              className="md:basis-1/2 lg:basis-1/4 flex justify-center"
-              key={index}
-            >
-              <Skeleton className="w-full h-20" />
-            </CarouselItem>
-          ))
+          ? <Loading />
           : data?.getProducts.map((product, _, self) => (
             <CarouselItem
               className={cn("md:basis-1/2", {

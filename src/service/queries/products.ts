@@ -18,8 +18,8 @@ export const GET_PRODUCTS = gql`
 `;
 
 export const GET_PRODUCT = gql`
-  query Product($where: ProductWhereUniqueInput!) {
-    product(where: $where) {
+  query GetProduct($id: String!) {
+    getProduct(id: $id) {
       id
       name
       description
