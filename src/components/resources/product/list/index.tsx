@@ -28,7 +28,7 @@ export const useOpenCreateProductModalContext = () =>
   useContext(OpenCreateProductModalContext);
 
 export const ListProduct = () => {
-  const { data, loading } = useQuery<{ products: Array<Product> }>(GET_PRODUCTS);
+  const { data, loading } = useQuery<{ getProducts: Array<Product> }>(GET_PRODUCTS);
 
   const [isOpenCreateProductModal, setIsOpenCreateProductModal] = useState(false);
 
@@ -44,7 +44,7 @@ export const ListProduct = () => {
               <Skeleton className="w-full h-20" />
             </CarouselItem>
           ))
-          : data?.products.map((product, _, self) => (
+          : data?.getProducts.map((product, _, self) => (
             <CarouselItem
               className={cn("md:basis-1/2", {
                 "lg:basis-1/4": self.length >= 4,
@@ -58,12 +58,12 @@ export const ListProduct = () => {
           ))}
         <CarouselItem
           className={cn({
-            "lg:basis-auto flex justify-center grow": data?.products.length === 0,
-            "md:basis-1/2 lg:basis-1/4": data?.products && data?.products.length >= 4,
-            "md:basis-1/2 lg:basis-1/3": data?.products.length === 3,
-            "md:basis-1/2 lg:basis-1/2": data?.products && data?.products.length <= 2,
+            "lg:basis-auto flex justify-center grow": data?.getProducts.length === 0,
+            "md:basis-1/2 lg:basis-1/4": data?.getProducts && data?.getProducts.length >= 4,
+            "md:basis-1/2 lg:basis-1/3": data?.getProducts.length === 3,
+            "md:basis-1/2 lg:basis-1/2": data?.getProducts && data?.getProducts.length <= 2,
           })}
-          key={data?.products.length}
+          key={data?.getProducts.length}
         >
           <OpenCreateProductModalContext.Provider
             value={{
@@ -80,13 +80,13 @@ export const ListProduct = () => {
                   className={cn(
                     "h-full w-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
                     {
-                      "min-h-20": data?.products.length === 0,
+                      "min-h-20": data?.getProducts.length === 0,
                     }
                   )}
                 >
                   <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
                     <PlusCircle />
-                    {data?.products.length === 0 ? (
+                    {data?.getProducts.length === 0 ? (
                       <p>Nenhum produto Cadastrado</p>
                     ) : (
                       <p>Adicionar produto</p>

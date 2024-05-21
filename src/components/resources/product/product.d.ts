@@ -11,3 +11,19 @@ export type Product = {
   categories?: Array<{ category: Category }>;
   orders?: Array<Order>;
 };
+
+export type IFormCreateProduct = {
+  name: string;
+  description: string;
+  price: number;
+  inventory_quantity: number;
+  categories: Array<{ name: string }>;
+};
+
+export type ProcutCreateInput = {
+  name: string;
+  description: string;
+  price: number;
+  inventory_quantity: number;
+  categories: Array<string>;
+};

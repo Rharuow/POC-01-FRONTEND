@@ -4,17 +4,19 @@ import { cn } from "@/lib/utils";
 import { useFormContext, useWatch } from "react-hook-form";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> { }
+
+export type OptionalsProps = {
+  label?: string;
+  Icon?: React.ElementType;
+  iconClassName?: string;
+  containerClassName?: string;
+  iconAction?: React.MouseEventHandler<HTMLDivElement>;
+}
 
 const Input = React.forwardRef<
   HTMLInputElement,
-  InputProps & {
-    label?: string;
-    Icon?: React.ElementType;
-    iconClassName?: string;
-    containerClassName?: string;
-    iconAction?: React.MouseEventHandler<HTMLDivElement>;
-  }
+  InputProps & OptionalsProps
 >(
   (
     {

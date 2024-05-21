@@ -17,46 +17,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Toggle } from "@/components/ui/toggle";
 import { GET_CATEGORIES } from "@/service/queries/category";
 import { Category } from "../../category/category";
-
-type IFormCreateProduct = {
-  name: string;
-  description: string;
-  price: number;
-  inventory_quantity: number;
-  categories: Array<{ name: string }>
-}
-
-type ProcutCreateInput = {
-  data: {
-    name: string;
-    description: string;
-    price: number;
-    inventory_quantity: number;
-    categories: {
-      createMany: {
-        data: Array<{ categoryName: string }>
-      }
-    }
-  };
-};
-
-const schema = z.object({
-  name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
-  description: z.string().min(10, { message: "Pelo menos 10 caracteres" }),
-  price: z.preprocess((a) => parseInt(z.string().parse(a), 10),
-    z.number()),
-  inventory_quantity: z.preprocess((a) => parseInt(z.string().parse(a), 10),
-    z.number())
-});
+import { formProdcutSchema } from "../schemas";
+import { IFormCreateProduct, ProcutCreateInput } from "../product";
+import InputGroup from "@/components/ui/inputGroup";
 
 export const FormCreateProduct = () => {
-  const [createOneProduct] = useMutation(CREATE_PRODUCT);
+  const [createProduct] = useMutation(CREATE_PRODUCT);
   const { data: categoryData } = useQuery<{ categories: Array<Category> }>(GET_CATEGORIES)
 
   const { setIsOpen } = useOpenCreateProductModalContext();
 
   const methods = useForm<IFormCreateProduct>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(formProdcutSchema),
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -75,34 +47,31 @@ export const FormCreateProduct = () => {
   });
 
   async function onSubmit(data: IFormCreateProduct) {
+    console.log("data = ", data);
 
     try {
       setIsLoading(true);
       const formattedData: ProcutCreateInput = {
-        data: {
-          name: data.name,
-          price: parseFloat(String(getValues("price"))),
-          description: data.description,
-          inventory_quantity: data.inventory_quantity,
-          ...(data.categories && {
-            categories: {
-              createMany: {
-                data: data.categories.map(category => ({ categoryName: category.name }))
-              }
-            }
-          })
-        }
+        name: data.name,
+        price: parseFloat(String(getValues("price"))),
+        description: data.description,
+        inventory_quantity: data.inventory_quantity,
+        ...(data.categories && {
+          categories: data.categories.map(category => (category.name))
+        })
       };
 
-      await createOneProduct({
+      console.log("formattedData = ", formattedData);
+
+      await createProduct({
         variables: formattedData,
-        update: (cache, { data: { createOneProduct } }) => {
-          const { products } = apolloClient.readQuery({ query: GET_PRODUCTS });
+        update: (cache, { data: { createProduct } }) => {
+          const { getProducts } = apolloClient.readQuery({ query: GET_PRODUCTS });
 
           cache.writeQuery({
             query: GET_PRODUCTS,
             data: {
-              products: [...products, createOneProduct],
+              getProducts: [...getProducts, createProduct],
             },
           });
         },
@@ -125,72 +94,14 @@ export const FormCreateProduct = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Nome"
-                {...register("name")}
-                autoFocus={false}
-                className={cn({
-                  "border border-red-700": errors && errors.name,
-                })}
-              />
-              {errors && errors.name && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.name.message}
-                </span>
-              )}
-            </div>
-          )}
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Valor"
-                inputMode="numeric"
-                step={0.01}
-                {...register("price")}
-                className={cn({
-                  "border border-red-700": errors && errors.price,
-                })}
-                type="number"
-              />
-              {errors && errors.price && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.price.message}
-                </span>
-              )}
-            </div>
-          )}
-          {isLoading ? (
-            <Skeleton className="w-full h-10 rounded-full" />
-          ) : (
-            <div className="flex flex-col">
-              <Input
-                label="Quantidade em estoque"
-                inputMode="numeric"
-                {...register("inventory_quantity")}
-                className={cn({
-                  "border border-red-700": errors && errors.inventory_quantity,
-                })}
-                type="number"
-              />
-              {errors && errors.inventory_quantity && (
-                <span className="text-xs text-red-400 font-bold">
-                  {errors.inventory_quantity.message}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-        {isLoading ? (
-          <Skeleton className="w-full h-10 rounded-full" />
-        ) : (
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
+            <InputGroup label="Nome" name="name" />
+            <InputGroup label="Valor" name="price" inputMode="numeric" step={0.01} min={0} type="number" />
+            <InputGroup label="Quantidade em estoque" name="inventory_quantity" inputMode="numeric" min={0} step={1} type="number" />
+          </div>
+
           <div className="flex flex-col">
             <Textarea
               label="Descrição"
@@ -205,10 +116,8 @@ export const FormCreateProduct = () => {
               </span>
             )}
           </div>
-        )}
-        {isLoading ? (
-          <Skeleton className="w-full h-10 rounded-full" />
-        ) :
+
+
           <div className="flex flex-col gap-2">
             <p>Categorias</p>
             <div className="flex flex-wrap gap-2">
@@ -228,7 +137,7 @@ export const FormCreateProduct = () => {
               <input key={field.id} {...register(`categories.${index}.name`)} readOnly hidden />
             ))}
           </div>
-        }
+        </div>
 
         <Button
           type="submit"

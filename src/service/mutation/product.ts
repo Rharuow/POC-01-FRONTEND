@@ -1,8 +1,20 @@
 import { gql } from "@apollo/client";
 
 export const CREATE_PRODUCT = gql`
-  mutation CreateOneProduct($data: ProductCreateInput!) {
-    createOneProduct(data: $data) {
+  mutation CreateProduct(
+    $categories: [String!]!
+    $inventory_quantity: Float!
+    $description: String!
+    $price: Float!
+    $name: String!
+  ) {
+    createProduct(
+      categories: $categories
+      inventory_quantity: $inventory_quantity
+      description: $description
+      price: $price
+      name: $name
+    ) {
       id
       name
       description
