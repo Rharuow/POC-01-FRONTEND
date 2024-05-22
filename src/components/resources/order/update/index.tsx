@@ -4,13 +4,13 @@ import { Pencil } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { useQuery } from '@apollo/client'
 import { Skeleton } from '@/components/ui/skeleton'
-import { GET_SALE } from '@/service/queries/sale'
-import { FormUpdateSale } from './form'
+import { GET_ORDER } from '@/service/queries/order'
+import { FormUpdateOrder } from './form'
 
-export default function UpdateSale({ id }: { id: string }) {
+export default function UpdateOrder({ id }: { id: string }) {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false)
 
-  const { loading, data } = useQuery(GET_SALE, {
+  const { loading, data } = useQuery(GET_ORDER, {
     variables: { where: { id } }
   })
 
@@ -23,7 +23,7 @@ export default function UpdateSale({ id }: { id: string }) {
         <div className="flex flex-col gap-4">
           {
             loading ? <Skeleton className='h-96 w-full' /> :
-              <FormUpdateSale setEditModalIsOpen={setEditModalIsOpen} sale={data?.sale} />
+              <FormUpdateOrder setEditModalIsOpen={setEditModalIsOpen} order={data?.order} />
           }
         </div>
       </DialogContent>

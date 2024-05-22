@@ -1,5 +1,5 @@
 import { Category } from "../category/category";
-import { Order } from "../order/order";
+import { Order } from "../orderItem/order";
 
 export type Product = {
   id?: string;

@@ -6,11 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useOpenCreateSaleModalContext } from "../list";
-import { FormCreateSale } from "./form";
+import { useOpenCreateOrderModalContext } from "../list";
+import { FormCreateOrder } from "./form";
 
-export const CreateSale = () => {
-  const { setIsOpen } = useOpenCreateSaleModalContext();
+export const CreateOrder = () => {
+  const { setIsOpen } = useOpenCreateOrderModalContext();
   return (
     <DialogContent
       className="max-w-[425px] md:max-w-[525px] lg:max-w-[825px]"
@@ -22,7 +22,7 @@ export const CreateSale = () => {
       <DialogHeader>
         <DialogTitle>Adicionar Venda</DialogTitle>
       </DialogHeader>
-      <FormCreateSale />
+      <FormCreateOrder />
     </DialogContent>
   );
 };

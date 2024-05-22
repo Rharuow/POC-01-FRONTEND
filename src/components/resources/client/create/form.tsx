@@ -50,10 +50,6 @@ export const FormCreateClient = () => {
         variables: data,
         update: (cache, { data: { createClient } }) => {
           const data = apolloClient.readQuery({ query: GET_CLIENTS });
-
-          console.log(createClient);
-          console.log(data);
-
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {

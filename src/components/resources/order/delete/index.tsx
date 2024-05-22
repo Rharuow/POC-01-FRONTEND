@@ -6,26 +6,26 @@ import { useMutation } from '@apollo/client'
 import { apolloClient } from '@/lib/apollo'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Sale } from '../sale'
-import { DELETE_SALE } from '@/service/mutation/sale'
-import { GET_SALES } from '@/service/queries/sale'
+import { Order } from '../order'
+import { DELETE_ORDER } from '@/service/mutation/order'
+import { GET_ORDERS } from '@/service/queries/order'
 
-export default function DeleteSale({ sale }: { sale: Sale }) {
+export default function DeleteOrder({ order }: { order: Order }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
 
-  const [deleteOneSale] = useMutation(DELETE_SALE)
+  const [deleteOneOrder] = useMutation(DELETE_ORDER)
 
-  async function handleDeleteSale(id: string) {
+  async function handleDeleteOrder(id: string) {
     try {
-      await deleteOneSale({
+      await deleteOneOrder({
         variables: { where: { id } },
-        update: (cache, { data: { deleteOneSale } }) => {
-          const { sales } = apolloClient.readQuery({ query: GET_SALES });
+        update: (cache, { data: { deleteOneOrder } }) => {
+          const { orders } = apolloClient.readQuery({ query: GET_ORDERS });
 
           cache.writeQuery({
-            query: GET_SALES,
+            query: GET_ORDERS,
             data: {
-              sales: sales.filter((pdt: Sale) => pdt.id !== deleteOneSale.id),
+              orders: orders.filter((pdt: Order) => pdt.id !== deleteOneOrder.id),
             },
           });
         }
@@ -48,11 +48,11 @@ export default function DeleteSale({ sale }: { sale: Sale }) {
       <DialogContent>
         <div className="flex flex-col gap-4">
           <DialogHeader>
-            <DialogTitle><p>Você deseja deletar {sale.id} do cliente {sale.client?.name}?</p></DialogTitle>
+            <DialogTitle><p>Você deseja deletar {order.id} do cliente {order.client?.name}?</p></DialogTitle>
           </DialogHeader>
           <DialogFooter>
             <div className="flex gap-2">
-              <Button onClick={() => handleDeleteSale(String(sale.id))}>Deletar</Button>
+              <Button onClick={() => handleDeleteOrder(String(order.id))}>Deletar</Button>
               <Button onClick={() => setDeleteModalIsOpen(false)}>Cancelar</Button>
             </div>
           </DialogFooter>

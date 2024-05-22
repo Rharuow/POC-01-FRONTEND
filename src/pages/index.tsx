@@ -1,14 +1,13 @@
 import { NavBar } from "@/components/nav-bar";
 import { ListClient } from "@/components/resources/client/list";
 import { ListProduct } from "@/components/resources/product/list";
-import { ListSale } from "@/components/resources/sale/list";
+import { ListOrder } from "@/components/resources/order/list";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Inter } from "next/font/google";
 
 
 export default function Home() {
@@ -35,7 +34,7 @@ export default function Home() {
           <AccordionItem value="item-3">
             <AccordionTrigger>Vendas</AccordionTrigger>
             <AccordionContent>
-              <ListSale />
+              <ListOrder />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

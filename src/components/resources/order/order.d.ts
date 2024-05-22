@@ -1,11 +1,20 @@
-import { Product } from "../product/product";
-import { Sale } from "../sale/sale";
+import { Client } from "../client/client";
+import { OrderItem } from "../orderItem/orderItem";
 
 export type Order = {
   id?: string;
-  amount?: number;
   totalPrice?: number;
 
-  product?: Product;
-  sale?: Sale;
-}
+  orderItems?: Array<OrderItem>;
+  client?: Client;
+};
+
+export type IFormCreateOrder = {
+  clientId: string;
+  orderItems: Array<{
+    productId: string;
+    amount: number | string;
+    totalPrice: number | string;
+  }>;
+  totalPrice: number | string;
+};

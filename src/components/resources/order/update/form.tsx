@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -10,40 +10,19 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apolloClient } from "@/lib/apollo";
-import { CREATE_SALE } from "@/service/mutation/sale";
+import { UPDATE_ORDER } from "@/service/mutation/order";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { Client } from "../../client/client";
-import { useOpenCreateSaleModalContext } from "../list";
-import { GET_SALES } from "@/service/queries/sale";
+import { GET_ORDERS } from "@/service/queries/order";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GET_PRODUCTS } from "@/service/queries/products";
 import { Product } from "../../product/product";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Order } from "../order";
+import { arraysAreIdentical } from "@/lib/validation/compareTwoArrays";
 
-type SaleCreateInput = {
-  data: {
-    client: {
-      connect: {
-        id: string;
-      }
-    };
-    orders: {
-      createMany: {
-        data: Array<
-          {
-            productId: string;
-            amount: number;
-            totalPrice: number;
-          }
-        >
-      }
-    };
-    totalPrice: number
-  };
-};
-
-type IFormCreateSale = {
+type IFormUpdateOrder = {
   clientId: string;
   orders: Array<{
     productId: string;
@@ -66,8 +45,8 @@ const schema = z.object({
   // })).nonempty()
 });
 
-export const FormCreateSale = () => {
-  const [createOneSale] = useMutation(CREATE_SALE);
+export const FormUpdateOrder = ({ setEditModalIsOpen, order }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>; order: Order }) => {
+  const [updateOneOrder] = useMutation(UPDATE_ORDER);
   const { data: clientsData, loading: clientsLoading } = useQuery<{ clients: Array<Client> }>(GET_CLIENTS)
   const { data: productsData, loading: productsLoading } = useQuery<{ products: Array<Product> }>(GET_PRODUCTS)
 
@@ -76,10 +55,13 @@ export const FormCreateSale = () => {
     currency: "BRL"
   })
 
-  const { setIsOpen } = useOpenCreateSaleModalContext();
-
-  const methods = useForm<IFormCreateSale>({
+  const methods = useForm<IFormUpdateOrder>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      clientId: order.client?.id,
+      totalPrice: order.totalPrice,
+      orders: order.orderItems?.map(orderItem => ({ amount: orderItem.amount, productId: orderItem.product?.id, totalPrice: orderItem.totalPrice }))
+    }
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -101,44 +83,20 @@ export const FormCreateSale = () => {
 
   const clientIdWatch = useWatch({ control, name: 'clientId' })
 
-  async function onSubmit(data: IFormCreateSale) {
+  async function onSubmit(data: IFormUpdateOrder) {
+
+    console.log(getValues("orders").map(order => ({
+      amount: Number(order.amount),
+      productId: order.productId,
+      totalPrice: Number(order.totalPrice)
+    })));
+
+
     try {
       setIsLoading(true);
-      const formattedData: SaleCreateInput = {
-        data: {
-          client: {
-            connect: {
-              id: data.clientId
-            }
-          },
-          orders: {
-            createMany: {
-              data: getValues("orders").map(order => ({
-                amount: Number(order.amount),
-                productId: order.productId,
-                totalPrice: Number(order.totalPrice)
-              }))
-            }
-          },
-          totalPrice: Number(getValues("totalPrice"))
-        }
-      };
 
-      await createOneSale({
-        variables: formattedData,
-        update: (cache, { data: { createOneSale } }) => {
-          const { sales } = apolloClient.readQuery({ query: GET_SALES });
-
-          cache.writeQuery({
-            query: GET_SALES,
-            data: {
-              sales: [...sales, createOneSale],
-            },
-          });
-        },
-      });
-      toast("Venda criada com sucesso");
-      setIsOpen(false);
+      toast("Venda atualizada com sucesso");
+      setEditModalIsOpen(false);
     } catch (error) {
       console.log(error);
       toast("Desculpe, algo está errado!");
@@ -173,8 +131,6 @@ export const FormCreateSale = () => {
     remove(index)
     handleTotalPrice()
   }
-
-  console.log(errors);
 
   return (
     <Form {...methods}>
@@ -311,6 +267,7 @@ export const FormCreateSale = () => {
         >
           Salvar
         </Button>
+        <Button variant={"outline"} type="button" onClick={() => setEditModalIsOpen(false)}>Cancelar</Button>
       </form>
     </Form>
 
