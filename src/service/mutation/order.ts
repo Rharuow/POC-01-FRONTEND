@@ -33,19 +33,24 @@ export const CREATE_ORDER = gql`
 `;
 
 export const DELETE_ORDER = gql`
-  mutation DeleteOneSale($where: SaleWhereUniqueInput!) {
-    deleteOneSale(where: $where) {
-      id
-    }
+  mutation DeleteOrder($id: String!) {
+    deleteOrder(id: $id)
   }
 `;
 
 export const UPDATE_ORDER = gql`
-  mutation UpdateOneSale(
-    $data: SaleUpdateInput!
-    $where: SaleWhereUniqueInput!
+  mutation UpdateOrder(
+    $orderItems: [CreateOrderItemInput!]!
+    $clientId: String!
+    $totalPrice: Float!
+    $updateOrderId: String!
   ) {
-    updateOneSale(data: $data, where: $where) {
+    updateOrder(
+      orderItems: $orderItems
+      clientId: $clientId
+      totalPrice: $totalPrice
+      id: $updateOrderId
+    ) {
       id
       client {
         id
@@ -55,7 +60,7 @@ export const UPDATE_ORDER = gql`
           billing
         }
       }
-      orders {
+      orderItems {
         amount
         totalPrice
         product {

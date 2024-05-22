@@ -20,7 +20,7 @@ export const CardOrder = ({ order }: { order: Order }) => {
         </ul>
         <p>Items ({totalProducts})</p>
         {order.orderItems?.map(orderItem => (
-          <ul>
+          <ul key={orderItem.id}>
             <li>Produto: <strong>{orderItem.product?.name}</strong></li>
             <li>Valor unitário: <strong>{orderItem.product?.price}</strong></li>
             <li>Quantidade: <strong>{orderItem.amount}</strong></li>

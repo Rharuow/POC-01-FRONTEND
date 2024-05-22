@@ -13,19 +13,19 @@ import { GET_ORDERS } from '@/service/queries/order'
 export default function DeleteOrder({ order }: { order: Order }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
 
-  const [deleteOneOrder] = useMutation(DELETE_ORDER)
+  const [deleteOrder] = useMutation(DELETE_ORDER)
 
   async function handleDeleteOrder(id: string) {
     try {
-      await deleteOneOrder({
-        variables: { where: { id } },
-        update: (cache, { data: { deleteOneOrder } }) => {
-          const { orders } = apolloClient.readQuery({ query: GET_ORDERS });
+      await deleteOrder({
+        variables: { id },
+        update: (cache) => {
+          const { getOrders } = apolloClient.readQuery({ query: GET_ORDERS });
 
           cache.writeQuery({
             query: GET_ORDERS,
             data: {
-              orders: orders.filter((pdt: Order) => pdt.id !== deleteOneOrder.id),
+              getOrders: getOrders.filter((pdt: Order) => pdt.id !== id),
             },
           });
         }

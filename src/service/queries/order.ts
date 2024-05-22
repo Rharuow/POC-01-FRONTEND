@@ -28,8 +28,8 @@ export const GET_ORDERS = gql`
 `;
 
 export const GET_ORDER = gql`
-  query Sales($where: SaleWhereUniqueInput!) {
-    sale(where: $where) {
+  query GetOrder($id: String!) {
+    getOrder(id: $id) {
       id
       totalPrice
       client {
@@ -40,7 +40,7 @@ export const GET_ORDER = gql`
           delivery
         }
       }
-      orders {
+      orderItems {
         id
         amount
         totalPrice
