@@ -12,6 +12,7 @@ export const CREATE_ORDER = gql`
       totalPrice: $totalPrice
     ) {
       id
+      totalPrice
       client {
         id
         name
@@ -21,9 +22,11 @@ export const CREATE_ORDER = gql`
         }
       }
       orderItems {
+        id
         amount
         totalPrice
         product {
+          id
           name
           price
         }
@@ -43,15 +46,16 @@ export const UPDATE_ORDER = gql`
     $orderItems: [CreateOrderItemInput!]!
     $clientId: String!
     $totalPrice: Float!
-    $updateOrderId: String!
+    $id: String!
   ) {
     updateOrder(
       orderItems: $orderItems
       clientId: $clientId
       totalPrice: $totalPrice
-      id: $updateOrderId
+      id: $id
     ) {
       id
+      totalPrice
       client {
         id
         name
@@ -61,9 +65,11 @@ export const UPDATE_ORDER = gql`
         }
       }
       orderItems {
+        id
         amount
         totalPrice
         product {
+          id
           name
           price
         }

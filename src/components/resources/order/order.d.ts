@@ -9,7 +9,7 @@ export type Order = {
   client?: Client;
 };
 
-export type IFormCreateOrder = {
+export type IFormOrder = {
   clientId: string;
   orderItems: Array<{
     productId: string;

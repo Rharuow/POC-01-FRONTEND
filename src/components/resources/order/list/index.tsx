@@ -15,6 +15,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Order } from "../order";
 import { CreateOrder } from "../create";
 import { GET_ORDERS } from "@/service/queries/order";
+import Loading from "./loading";
 
 const OpenCreateOrderModalContext = createContext<{
   isOpen: boolean;
@@ -36,14 +37,7 @@ export const ListOrder = () => {
     <Carousel className="w-full">
       <CarouselContent className="w-full">
         {loading
-          ? Array.from({ length: 4 }).map((_, index) => (
-            <CarouselItem
-              className="md:basis-1/2 lg:basis-1/4 flex justify-center"
-              key={index}
-            >
-              <Skeleton className="w-full h-20" />
-            </CarouselItem>
-          ))
+          ? <Loading />
           : data?.getOrders.map((order, _, self) => (
             <CarouselItem
               className={cn("md:basis-1/2", {

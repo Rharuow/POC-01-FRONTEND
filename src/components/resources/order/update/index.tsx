@@ -11,7 +11,7 @@ export default function UpdateOrder({ id }: { id: string }) {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false)
 
   const { loading, data } = useQuery(GET_ORDER, {
-    variables: { where: { id } }
+    variables: { id }
   })
 
   return (
@@ -23,7 +23,7 @@ export default function UpdateOrder({ id }: { id: string }) {
         <div className="flex flex-col gap-4">
           {
             loading ? <Skeleton className='h-96 w-full' /> :
-              <FormUpdateOrder setEditModalIsOpen={setEditModalIsOpen} order={data?.order} />
+              <FormUpdateOrder setEditModalIsOpen={setEditModalIsOpen} order={data?.getOrder} />
           }
         </div>
       </DialogContent>
