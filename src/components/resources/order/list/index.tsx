@@ -6,7 +6,6 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@apollo/client";
 import { CardOrder } from "./card";
 import { cn } from "@/lib/utils";

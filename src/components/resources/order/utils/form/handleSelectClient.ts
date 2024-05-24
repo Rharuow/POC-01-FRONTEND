@@ -17,11 +17,12 @@ export function handleSelectClient({
   setValue: UseFormSetValue<IFormOrder>;
   product: Product;
 }) {
-  fields.length === 0 &&
+  if (fields.length === 0) {
     append({
       amount: "1",
       productId: String(product.id),
       totalPrice: String(product.price),
     });
-  setValue("totalPrice", String(product.price));
+    setValue("totalPrice", String(product.price));
+  }
 }
