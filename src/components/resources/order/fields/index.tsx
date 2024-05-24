@@ -3,7 +3,6 @@ import React from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { formatCurrency } from '@/utils/currencyConverter'
 import { Button } from '@/components/ui/button'
-import InputGroup from '@/components/ui/inputGroup'
 import { handleTotalPrice } from '../utils/form/handleTotalPrice'
 import { isLast } from '../utils/form/isLast'
 import { handleRemove } from '../utils/form/removeField'
@@ -13,8 +12,9 @@ import { Client } from '../../client/client'
 import { Product } from '../../product/product'
 import { IFormOrder } from '../order'
 import ClientIdField from './clientId'
-import ProductIdField from './productId'
-import AmountField from './amount'
+import ProductIdField from './orderItemProductId'
+import AmountField from './orderItemAmount'
+import TotalPrice from './orderItemTotalPrice'
 
 const Fields = ({
   clients,
@@ -33,7 +33,7 @@ const Fields = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <ClientIdField clients={clients} products={products} />
+      <ClientIdField clients={clients} products={products} append={append} fields={fields} />
       {
         fields.map((field, index) => (
           <div className="grid grid-cols-5 gap-2" key={field.id}>
@@ -41,13 +41,7 @@ const Fields = ({
               <ProductIdField index={index} products={products} />
             </div>
             <AmountField index={index} products={products} />
-            <InputGroup
-              label="Valor total"
-              inputMode="numeric"
-              readOnly
-              type="number"
-              name={`orderItems.${index}.totalPrice`}
-            />
+            <TotalPrice index={index} />
             <Button
               type="button"
               className="rounded-full"

@@ -1,6 +1,5 @@
 import {
   FieldArrayWithId,
-  FieldValues,
   UseFieldArrayAppend,
   UseFormSetValue,
 } from "react-hook-form";
@@ -14,9 +13,7 @@ export function handleSelectClient({
   append,
 }: {
   fields: Array<FieldArrayWithId<IFormOrder, "orderItems", "id">>;
-  append:
-    | UseFieldArrayAppend<IFormOrder, "orderItems">
-    | UseFieldArrayAppend<FieldValues, "orderItems">;
+  append: UseFieldArrayAppend<IFormOrder, "orderItems">;
   setValue: UseFormSetValue<IFormOrder>;
   product: Product;
 }) {
