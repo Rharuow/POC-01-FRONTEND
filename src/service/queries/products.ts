@@ -9,9 +9,7 @@ export const GET_PRODUCTS = gql`
       price
       inventory_quantity
       categories {
-        category {
-          name
-        }
+        categoryName
       }
     }
   }
@@ -26,9 +24,7 @@ export const GET_PRODUCT = gql`
       price
       inventory_quantity
       categories {
-        category {
-          name
-        }
+        categoryName
       }
     }
   }

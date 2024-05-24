@@ -4,11 +4,11 @@ import { Order } from "../orderItem/order";
 export type Product = {
   id?: string;
   name?: string;
-  price?: number;
+  price?: number | string;
   description?: string;
-  inventory_quantity: number;
+  inventory_quantity: number | string;
 
-  categories?: Array<{ category: Category }>;
+  categories?: Array<{ categoryName: string }>;
   orders?: Array<Order>;
 };
 
@@ -24,6 +24,6 @@ export type ProductInput = {
   name: string;
   description: string;
   price: number;
-  inventory_quantity: number;
+  inventory_quantity: number | string;
   categories: Array<string>;
 };
