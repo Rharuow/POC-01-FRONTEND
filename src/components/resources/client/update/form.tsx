@@ -17,6 +17,7 @@ import Loading from "./loading";
 import InputGroup from "@/components/ui/inputGroup";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CLIENTS } from "@/service/queries/clients";
+import Fields from "../fields";
 
 export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>; client: Client }) => {
   const [updateClient] = useMutation(UPDATE_CLIENT);
@@ -76,70 +77,9 @@ export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalI
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         {
-          isLoading ? <Loading /> : <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2 md:grid md:grid-cols-2">
-              <InputGroup label="Nome" name="name" />
-              <InputGroup label="Email" name="email" />
-            </div>
-            <InputGroup label="Endereço  de cobrança" name="billing" />
-            <InputGroup label="Endreço de entrega" name="delivery" />
-            <Tabs defaultValue={typeDocument}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger
-                  value="cpf"
-                  disabled={isLoading}
-                  onClick={() => {
-                    setCnpjIsInvalid(false);
-                    setTypeDocument("cpf");
-                  }}
-                >
-                  CPF
-                </TabsTrigger>
-                <TabsTrigger
-                  value="cnpj"
-                  disabled={isLoading}
-                  onClick={() => {
-                    setCpfIsInvalid(false);
-                    setTypeDocument("cnpj");
-                  }}
-                >
-                  CNPJ
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="cpf">
-                <InputGroup
-                  label="CPF"
-                  name="cpf"
-                  onChange={(event) => setValue("cpf", cpfMask(event.target.value))}
-                  onBlur={(event) => setCpfIsInvalid(!cpfIsValid(event.target.value))}
-                />
-              </TabsContent>
-              <TabsContent value="cnpj">
-                <InputGroup
-                  label="CNPJ"
-                  name="cnpj"
-                  onChange={(event) => {
-                    setCnpjIsInvalid(!cnpjIsValid(event.target.value));
-                    setValue("cnpj", cnpjMask(event.target.value));
-                  }}
-                  onBlur={(event) => setCnpjIsInvalid(!cnpjIsValid(event.target.value))}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
+          isLoading ? <Loading /> :
+            <Fields isLoading={isLoading} />
         }
-
-        <Button
-          type="submit"
-          disabled={
-            Object.keys(errors).length !== 0 ||
-            cnpjIsInvalid ||
-            cpfIsInvalid ||
-            isLoading
-          }
-        >
-          Salvar
-        </Button>
         <Button
           type="button"
           variant={"outline"}
