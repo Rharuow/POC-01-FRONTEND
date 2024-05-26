@@ -17,7 +17,7 @@ const Fields = ({ categories, isLoading }: { categories: Array<Category>; isLoad
         <div className="flex flex-col gap-2 md:grid md:grid-cols-3">
           <InputGroup label="Nome" name="name" />
           <InputGroup label="Valor" name="price" inputMode="numeric" step={0.01} min={0} type="number" />
-          <InputGroup label="Quantidade em estoque" name="inventory_quantity" inputMode="numeric" min={0} step={1} type="number" />
+          <InputGroup label="Estoque" name="inventory_quantity" inputMode="numeric" min={0} step={1} type="number" />
         </div>
 
         <TextareaGroup name='description' />

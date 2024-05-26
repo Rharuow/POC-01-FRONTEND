@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
 
 import { apolloClient } from "@/lib/apollo";
 import { CREATE_PRODUCT } from "@/service/mutation/product";
-import { useOpenCreateProductModalContext } from "../list";
 import { GET_PRODUCTS } from "@/service/queries/products";
 import { GET_CATEGORIES } from "@/service/queries/category";
 import { Category } from "../../category/category";
@@ -18,8 +17,6 @@ import Fields from "../fields";
 export const FormCreateProduct = () => {
   const [createProduct] = useMutation(CREATE_PRODUCT);
   const { data: categoryData, loading } = useQuery<{ getCategories: Array<Category> }>(GET_CATEGORIES)
-
-  const { setIsOpen } = useOpenCreateProductModalContext();
 
   const methods = useForm<IFormProduct>({
     resolver: zodResolver(formProdcutSchema),
@@ -44,7 +41,6 @@ export const FormCreateProduct = () => {
           categories: data.categories.map(category => (category.name))
         })
       };
-
       await createProduct({
         variables: formattedData,
         update: (cache, { data: { createProduct } }) => {
@@ -59,7 +55,6 @@ export const FormCreateProduct = () => {
         },
       });
       toast("Produto criado com sucesso");
-      setIsOpen(false);
     } catch (error) {
       console.log(error);
       toast("Desculpe, algo está errado!");
