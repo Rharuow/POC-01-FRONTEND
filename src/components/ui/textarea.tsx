@@ -16,7 +16,6 @@ const Textarea = React.forwardRef<
 
   const {
     control,
-    formState: { errors },
   } = useFormContext();
 
   const valueWatch = useWatch({ control, name: String(props.name) });
@@ -26,10 +25,7 @@ const Textarea = React.forwardRef<
       <textarea
         className={cn(
           "flex min-h-[80px] w-full border z-10 border-input rounded-xl bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-          className,
-          {
-            "border-red-700": errors,
-          }
+          className
         )}
         ref={ref}
         onFocus={(event) => {

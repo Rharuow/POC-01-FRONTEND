@@ -2,6 +2,7 @@ import React from 'react'
 import { Input, InputProps, OptionalsProps } from './input'
 import { useFormContext } from 'react-hook-form'
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
 const InputGroup = React.forwardRef<
   HTMLInputElement,
@@ -12,6 +13,7 @@ const InputGroup = React.forwardRef<
       onBlur,
       onChange,
       name,
+      tooltip,
       ...props
     },
     ref
@@ -20,22 +22,53 @@ const InputGroup = React.forwardRef<
 
     return (
       <div className="flex flex-col">
-        <Input
-          {...register(String(name), {
-            ...(onChange && { onChange }),
-            ...(onBlur && { onBlur })
-          })}
-          autoFocus={false}
-          className={cn({
-            "border border-red-700": errors && errors[String(name)],
-          })}
-          {...props}
-        />
-        {errors && errors[String(name)] && (
-          <span className="text-xs text-red-400 font-bold">
-            {String(errors[String(name)]?.message)}
-          </span>
-        )}
+        {tooltip ?
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <>
+                  <Input
+                    {...register(String(name), {
+                      ...(onChange && { onChange }),
+                      ...(onBlur && { onBlur })
+                    })}
+                    autoFocus={false}
+                    className={cn({
+                      "border border-red-700": errors && errors[String(name)],
+                    })}
+                    {...props}
+                  />
+                  {errors && errors[String(name)] && (
+                    <span className="text-xs text-red-400 font-bold">
+                      {String(errors[String(name)]?.message)}
+                    </span>
+                  )}
+                </>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider> :
+          <>
+            <Input
+              {...register(String(name), {
+                ...(onChange && { onChange }),
+                ...(onBlur && { onBlur })
+              })}
+              autoFocus={false}
+              className={cn({
+                "border border-red-700": errors && errors[String(name)],
+              })}
+              {...props}
+            />
+            {errors && errors[String(name)] && (
+              <span className="text-xs text-red-400 font-bold">
+                {String(errors[String(name)]?.message)}
+              </span>
+            )}
+          </>
+        }
       </div>
     )
   }

@@ -28,11 +28,11 @@ const TextareaGroup = React.forwardRef<
             ...(onBlur && { onBlur })
           })}
           className={cn({
-            "border border-red-700": errors && errors.description,
+            "border border-red-700": errors && errors[String(name)],
           })}
           {...props}
         />
-        {errors && errors.description && (
+        {errors && errors[String(name)] && (
           <span className="text-xs text-red-400 font-bold">
             {String(errors[String(name)]?.message)}
           </span>

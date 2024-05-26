@@ -12,6 +12,8 @@ export type OptionalsProps = {
   iconClassName?: string;
   containerClassName?: string;
   iconAction?: React.MouseEventHandler<HTMLDivElement>;
+  dark?: boolean;
+  tooltip?: string
 }
 
 const Input = React.forwardRef<

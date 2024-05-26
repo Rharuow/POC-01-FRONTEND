@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { useMutation } from "@apollo/client";
-import { useOpenCreateClientModalContext } from "../list";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { apolloClient } from "@/lib/apollo";
 import { CREATE_CLIENT } from "@/service/mutation/client";
@@ -12,6 +11,7 @@ import Loading from "./loading";
 import { formClientSchema } from "../schemas";
 import { IFormClient } from "../client";
 import Fields from "../fields";
+import { useOpenCreateClientModalContext } from ".";
 
 export const FormCreateClient = () => {
   const [createClient] = useMutation(CREATE_CLIENT);
@@ -34,7 +34,6 @@ export const FormCreateClient = () => {
   async function onSubmit(data: IFormClient) {
     try {
       setIsLoading(true);
-
       await createClient({
         variables: data,
         update: (cache, { data: { createClient } }) => {
@@ -56,7 +55,6 @@ export const FormCreateClient = () => {
       setIsLoading(false);
     }
   }
-
 
   return (
     <FormProvider {...methods}>

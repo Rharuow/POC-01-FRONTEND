@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
-import { PlusCircle } from "lucide-react";
+import React from "react";
 
 import {
   Carousel,
@@ -10,31 +9,28 @@ import { GET_CLIENTS } from "@/service/queries/clients";
 import { useQuery } from "@apollo/client";
 import { CardClient } from "./card";
 import { cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { CreateClient } from "../create";
 import { Client } from "../client";
 import Loading from "./loading";
 
-const OpenCreateClientModalContext = createContext<{
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}>({
-  isOpen: false,
-  setIsOpen: () => { },
-});
-
-export const useOpenCreateClientModalContext = () =>
-  useContext(OpenCreateClientModalContext);
-
 export const ListClient = () => {
   const { data, loading } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS);
 
-  const [isOpenCreateClientModal, setIsOpenCreateClientModal] = useState(false);
 
   return (
     <Carousel className="w-full">
       <CarouselContent className="w-full">
+        <CarouselItem
+          className={cn({
+            "lg:basis-auto flex justify-center grow": data?.getClients.length === 0,
+            "md:basis-1/2 lg:basis-1/4": data?.getClients && data?.getClients.length >= 4,
+            "md:basis-1/2 lg:basis-1/3": data?.getClients.length === 3,
+            "md:basis-1/2 lg:basis-1/2": data?.getClients && data?.getClients.length <= 2,
+          })}
+          key={data?.getClients.length}
+        >
+          <CreateClient clients={data?.getClients} />
+        </CarouselItem>
         {loading
           ? <Loading />
           : data?.getClients.map((client, _, self) => (
@@ -49,48 +45,6 @@ export const ListClient = () => {
               <CardClient client={client} />
             </CarouselItem>
           ))}
-        <CarouselItem
-          className={cn({
-            "lg:basis-auto flex justify-center grow": data?.getClients.length === 0,
-            "md:basis-1/2 lg:basis-1/4": data?.getClients && data?.getClients.length >= 4,
-            "md:basis-1/2 lg:basis-1/3": data?.getClients.length === 3,
-            "md:basis-1/2 lg:basis-1/2": data?.getClients && data?.getClients.length <= 2,
-          })}
-          key={data?.getClients.length}
-        >
-          <OpenCreateClientModalContext.Provider
-            value={{
-              isOpen: isOpenCreateClientModal,
-              setIsOpen: setIsOpenCreateClientModal,
-            }}
-          >
-            <Dialog open={isOpenCreateClientModal}>
-              <DialogTrigger
-                asChild
-                onClick={() => setIsOpenCreateClientModal(true)}
-              >
-                <Card
-                  className={cn(
-                    "h-full w-full bg-transparent text-white border-dashed hover:cursor-pointer p-0",
-                    {
-                      "min-h-20": data?.getClients.length === 0,
-                    }
-                  )}
-                >
-                  <CardContent className="flex flex-col gap-4 justify-center items-center p-4">
-                    <PlusCircle />
-                    {data?.getClients.length === 0 ? (
-                      <p>Nenhum cliente Cadastrado</p>
-                    ) : (
-                      <p>Adicionar Cliente</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <CreateClient />
-            </Dialog>
-          </OpenCreateClientModalContext.Provider>
-        </CarouselItem>
       </CarouselContent>
     </Carousel>
   );

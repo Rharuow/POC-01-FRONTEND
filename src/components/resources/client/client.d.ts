@@ -12,8 +12,15 @@ export type Client = {
 export interface IFormClient {
   name: string;
   email: string;
-  cpf: string;
-  cnpj: string;
   billing: string;
   delivery: string;
+  cpf: string;
+  cnpj: string;
+  zipCode: string;
+  state: string;
+  city: string;
+  neighborhood: string;
+  street: string;
+  number: string;
+  complement: string;
 }

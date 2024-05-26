@@ -8,10 +8,12 @@ import { cpfIsValid } from '@/lib/validation/cpf';
 import { cnpjIsValid } from '@/lib/validation/cnpj';
 import { cnpjMask } from '@/lib/mask/cnpj';
 import { Button } from '@/components/ui/button';
+import Billing from './address/billing';
+import Delivery from './address/delivery';
 
 const Fields = ({ isLoading }: { isLoading: boolean }) => {
 
-  const { setValue, formState: { errors } } = useFormContext<IFormClient>()
+  const { setValue } = useFormContext<IFormClient>()
 
   const [typeDocument, setTypeDocument] = useState<"cpf" | "cnpj">("cpf");
   const [cpfIsInvalid, setCpfIsInvalid] = useState(false);
@@ -24,9 +26,8 @@ const Fields = ({ isLoading }: { isLoading: boolean }) => {
           <InputGroup label="Nome" name="name" />
           <InputGroup label="Email" name="email" />
         </div>
-        <InputGroup label="Endereço  de cobrança" name="billing" />
-        <InputGroup label="Endreço de entrega" name="delivery" />
-
+        <Billing />
+        <Delivery />
         <Tabs defaultValue={typeDocument}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger
@@ -72,7 +73,6 @@ const Fields = ({ isLoading }: { isLoading: boolean }) => {
       <Button
         type="submit"
         disabled={
-          Object.keys(errors).length !== 0 ||
           cnpjIsInvalid ||
           cpfIsInvalid ||
           isLoading
