@@ -9,7 +9,6 @@ import { apolloClient } from "@/lib/apollo";
 import { CREATE_ORDER } from "@/service/mutation/order";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import { Client } from "../../client/client";
-import { useOpenCreateOrderModalContext } from "../list";
 import { GET_ORDERS } from "@/service/queries/order";
 import { GET_PRODUCTS } from "@/service/queries/products";
 import { Product } from "../../product/product";
@@ -23,8 +22,6 @@ export const FormCreateOrder = () => {
   const [createOrder] = useMutation(CREATE_ORDER);
   const { data: clientsData, loading: clientsLoading } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS)
   const { data: productsData, loading: productsLoading } = useQuery<{ getProducts: Array<Product> }>(GET_PRODUCTS)
-
-  const { setIsOpen } = useOpenCreateOrderModalContext();
 
   const methods = useForm<IFormOrder>({
     resolver: zodResolver(formOrderSchema),
@@ -57,7 +54,6 @@ export const FormCreateOrder = () => {
         }
       })
       toast("Venda criada com sucesso");
-      setIsOpen(false);
     } catch (error) {
       console.log(error);
       toast("Desculpe, algo está errado!");
