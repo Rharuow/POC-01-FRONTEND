@@ -5,6 +5,8 @@ export type Order = {
   id?: string;
   totalPrice?: number;
 
+  createdAt?: string;
+
   orderItems?: Array<OrderItem>;
   client?: Client;
 };

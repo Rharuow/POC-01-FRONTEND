@@ -1,56 +1,99 @@
 import React from "react";
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { useQuery } from "@apollo/client";
-import { CardOrder } from "./card";
-import { cn } from "@/lib/utils";
 import { Order } from "../order";
 import { CreateOrder } from "../create";
-import { GET_ORDERS } from "@/service/queries/order";
-import Loading from "./loading";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { formatCurrency } from "@/utils/currencyConverter";
+import { cn } from "@/lib/utils";
+import DeleteOrder from "../delete";
+import UpdateOrder from "../update";
+import { Separator } from "@/components/ui/separator";
 
 
-export const ListOrder = () => {
-  const { data, loading } = useQuery<{ getOrders: Array<Order> }>(GET_ORDERS);
+export const ListOrder = ({ orders }: { orders: Array<Order> }) => {
 
   return (
-    <Carousel className="w-full">
-      <CarouselContent className="w-full">
-        {loading
-          ? <Loading />
-          :
-          <>
-            <CarouselItem
-              className={cn({
-                "lg:basis-auto flex justify-center grow": data?.getOrders.length === 0,
-                "md:basis-1/2 lg:basis-1/4": data?.getOrders && data?.getOrders.length >= 4,
-                "md:basis-1/2 lg:basis-1/3": data?.getOrders.length === 3,
-                "md:basis-1/2 lg:basis-1/2": data?.getOrders && data?.getOrders.length <= 2,
-              })}
-              key={data?.getOrders.length}
-            >
-              <CreateOrder orders={data?.getOrders as Array<Order>} />
-            </CarouselItem>
-            {data?.getOrders.map((order, _, self) => (
-              <CarouselItem
-                className={cn("md:basis-1/2", {
-                  "lg:basis-1/4": self.length >= 4,
-                  "lg:basis-1/3": self.length === 3,
-                  "lg:basis-1/2": self.length <= 2,
-                })}
-                key={order.id}
-              >
-                <CardOrder order={order} />
-              </CarouselItem>
-            ))}
-          </>
-        }
-
-      </CarouselContent>
-    </Carousel>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="text-center">Cliente</TableHead>
+          <TableHead className="text-center">Produtos</TableHead>
+          <TableHead className="text-center">Valores unitários</TableHead>
+          <TableHead className="text-center">Quantidades</TableHead>
+          <TableHead className="text-center">Valores totais</TableHead>
+          <TableHead className="text-center">Total da venda</TableHead>
+          <TableHead className="text-center"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {orders.map((order) => (
+          <TableRow key={order.id}>
+            <TableCell><p className="text-center">{order.client?.name}</p></TableCell>
+            <TableCell>
+              <div className="flex flex-col gap-2">
+                {order.orderItems?.map((orderItem, index, self) => (
+                  <div className="flex flex-col gap-2" key={orderItem.id}>
+                    <p className={cn("flex flex-col items-center gap-1 px-1 rounded bg-gray-700", { "bg-gray-500": index % 2 === 0 })}>
+                      {orderItem.product?.name}
+                    </p>
+                    {self.length > 1 && index < self.length - 1 && <Separator className="h-[1px] bg-transparent border-b border-dotted" />}
+                  </div>
+                ))}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col gap-2">
+                {order.orderItems?.map((orderItem, index, self) => (
+                  <div className="flex flex-col gap-2" key={orderItem.id}>
+                    <p className={cn("flex flex-col items-center gap-1 px-1 rounded bg-gray-700", { "bg-gray-500": index % 2 === 0 })}>
+                      {formatCurrency(Number(orderItem.totalPrice) / Number(orderItem.amount))}
+                    </p>
+                    {self.length > 1 && index < self.length - 1 && <Separator className="h-[1px] bg-transparent border-b border-dotted" />}
+                  </div>
+                ))}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col gap-2">
+                {order.orderItems?.map((orderItem, index, self) => (
+                  <div className="flex flex-col gap-2" key={orderItem.id} >
+                    <p className={cn("flex flex-col items-center gap-1 px-1 rounded bg-gray-700", { "bg-gray-500": index % 2 === 0 })}>
+                      {orderItem.amount}
+                    </p>
+                    {self.length > 1 && index < self.length - 1 && <Separator className="h-[1px] bg-transparent border-b border-dotted" />}
+                  </div>
+                ))}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col gap-2">
+                {order.orderItems?.map((orderItem, index, self) => (
+                  <div className="flex flex-col gap-2" key={orderItem.id}>
+                    <p className={cn("flex flex-col items-center gap-1 px-1 rounded bg-gray-700", { "bg-gray-500": index % 2 === 0 })}>
+                      {formatCurrency(Number(orderItem.totalPrice))}
+                    </p>
+                    {self.length > 1 && index < self.length - 1 && <Separator className="h-[1px] bg-transparent border-b border-dotted" />}
+                  </div>
+                ))}
+              </div>
+            </TableCell>
+            <TableCell>
+              <p className="text-center">{formatCurrency(Number(order.totalPrice))}</p>
+            </TableCell>
+            <TableCell>
+              <div className="flex gap-2">
+                <DeleteOrder order={order} />
+                <UpdateOrder id={String(order.id)} />
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+        <TableRow>
+          <TableCell colSpan={7}>
+            <CreateOrder orders={orders} />
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   );
 };

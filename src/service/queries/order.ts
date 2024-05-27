@@ -5,6 +5,7 @@ export const GET_ORDERS = gql`
     getOrders {
       id
       totalPrice
+      createdAt
       client {
         id
         name
@@ -32,6 +33,7 @@ export const GET_ORDER = gql`
     getOrder(id: $id) {
       id
       totalPrice
+      createdAt
       client {
         id
         name

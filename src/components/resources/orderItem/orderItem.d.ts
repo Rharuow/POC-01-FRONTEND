@@ -1,5 +1,5 @@
 import { Product } from "../product/product";
-import { Sale } from "../order/sale";
+import { Order } from "../order/order";
 
 export type OrderItem = {
   id?: string;
@@ -7,5 +7,5 @@ export type OrderItem = {
   totalPrice?: number;
 
   product?: Product;
-  sale?: Sale;
+  order?: Order;
 };

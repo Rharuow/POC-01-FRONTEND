@@ -15,7 +15,10 @@ import LoadingClients from "@/components/resources/client/list/loading";
 import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 import { Product } from "@/components/resources/product/product";
 import { GET_PRODUCTS } from "@/service/queries/products";
-import LoadingProducts from "@/components/resources/product/update/loading";
+import LoadingProducts from "@/components/resources/product/list/loading";
+import { Order } from "@/components/resources/order/order";
+import { GET_ORDERS } from "@/service/queries/order";
+import LoadingOrders from "@/components/resources/order/list/loading";
 
 type AccordionValue = "clients" | "products" | "orders" | ""
 
@@ -26,8 +29,10 @@ export const useAccordionContext = () => useContext(AccordionContext)
 export default function Home() {
   const { data: dataClients, loading: loadingClients } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS);
   const { data: dataProducts, loading: loadingProducts } = useQuery<{ getProducts: Array<Product> }>(GET_PRODUCTS)
+  const { data: dataOrders, loading: loadingOrders } = useQuery<{ getOrders: Array<Order> }>(GET_ORDERS);
 
-  const [accordionValue, setAccordionValue] = useState<AccordionValue>("products")
+
+  const [accordionValue, setAccordionValue] = useState<AccordionValue>("orders")
 
   return (
     <main
@@ -80,9 +85,16 @@ export default function Home() {
               >
                 Vendas
               </AccordionTrigger>
-              <AccordionContent>
-                <ListOrder />
-              </AccordionContent>
+              {
+                loadingOrders ?
+                  <AccordionContent>
+                    <LoadingOrders />
+                  </AccordionContent>
+                  :
+                  <AccordionContent>
+                    <ListOrder orders={dataOrders?.getOrders as Array<Order>} />
+                  </AccordionContent>
+              }
             </AccordionItem>
           </Accordion>
         </AccordionContext.Provider>

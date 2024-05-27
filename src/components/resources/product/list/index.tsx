@@ -44,7 +44,7 @@ export const ListProduct = ({ products }: { products: Array<Product> }) => {
           </TableRow>
         ))}
         <TableRow>
-          <TableCell colSpan={7}>
+          <TableCell colSpan={5}>
             <CreateProduct products={products} />
           </TableCell>
         </TableRow>

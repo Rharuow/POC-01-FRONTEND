@@ -17,11 +17,15 @@ import Loading from "./loading";
 import { IFormOrder } from "../order";
 import { formOrderSchema } from "../schemas";
 import Fields from "../fields";
+import { useAccordionContext } from "@/pages";
+import { DialogClose } from "@/components/ui/dialog";
 
 export const FormCreateOrder = () => {
   const [createOrder] = useMutation(CREATE_ORDER);
   const { data: clientsData, loading: clientsLoading } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS)
   const { data: productsData, loading: productsLoading } = useQuery<{ getProducts: Array<Product> }>(GET_PRODUCTS)
+
+  const { setAccordionValue } = useAccordionContext()
 
   const methods = useForm<IFormOrder>({
     resolver: zodResolver(formOrderSchema),
@@ -40,6 +44,7 @@ export const FormCreateOrder = () => {
 
   async function onSubmit(data: IFormOrder) {
     try {
+      setAccordionValue("")
       setIsLoading(true);
       await createOrder({
         variables: data,
@@ -53,6 +58,7 @@ export const FormCreateOrder = () => {
           })
         }
       })
+      setAccordionValue("orders")
       toast("Venda criada com sucesso");
     } catch (error) {
       console.log(error);
@@ -71,15 +77,15 @@ export const FormCreateOrder = () => {
               clients={clientsData?.getClients as Array<Client>}
               products={productsData?.getProducts as Array<Product>}
             />
-            <Button
+            <DialogClose
+              className="bg-primary text-white p-2 rounded-lg"
               type="submit"
               disabled={
                 Object.keys(errors).length !== 0 ||
                 isLoading || !clientIdWatch
-              }
-            >
+              }>
               Salvar
-            </Button>
+            </DialogClose>
           </form>
       }
     </Form>
