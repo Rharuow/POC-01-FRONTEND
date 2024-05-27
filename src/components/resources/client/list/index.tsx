@@ -1,51 +1,47 @@
 import React from "react";
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { GET_CLIENTS } from "@/service/queries/clients";
-import { useQuery } from "@apollo/client";
-import { CardClient } from "./card";
-import { cn } from "@/lib/utils";
 import { CreateClient } from "../create";
 import { Client } from "../client";
-import Loading from "./loading";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import DeleteClient from "../delete";
+import UpdateClient from "../update";
 
-export const ListClient = () => {
-  const { data, loading } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS);
-
+export const ListClient = ({ clients }: { clients: Array<Client> }) => {
 
   return (
-    <Carousel className="w-full">
-      <CarouselContent className="w-full">
-        <CarouselItem
-          className={cn({
-            "lg:basis-auto flex justify-center grow": data?.getClients.length === 0,
-            "md:basis-1/2 lg:basis-1/4": data?.getClients && data?.getClients.length >= 4,
-            "md:basis-1/2 lg:basis-1/3": data?.getClients.length === 3,
-            "md:basis-1/2 lg:basis-1/2": data?.getClients && data?.getClients.length <= 2,
-          })}
-          key={data?.getClients.length}
-        >
-          <CreateClient clients={data?.getClients} />
-        </CarouselItem>
-        {loading
-          ? <Loading />
-          : data?.getClients.map((client, _, self) => (
-            <CarouselItem
-              className={cn("md:basis-1/2", {
-                "lg:basis-1/4": self.length >= 4,
-                "lg:basis-1/3": self.length === 3,
-                "lg:basis-1/2": self.length <= 2,
-              })}
-              key={client.id}
-            >
-              <CardClient client={client} />
-            </CarouselItem>
-          ))}
-      </CarouselContent>
-    </Carousel>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>CPF</TableHead>
+          <TableHead>CNPJ</TableHead>
+          <TableHead>Cobrança</TableHead>
+          <TableHead>Entrega</TableHead>
+          <TableHead></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {clients.map((client) => (
+          <TableRow key={client.id}>
+            <TableCell><p>{client.name}</p></TableCell>
+            <TableCell><p>{client.email}</p></TableCell>
+            <TableCell><p>{client.document && client.document?.cpf ? client.document?.cpf : "Não informado"}</p></TableCell>
+            <TableCell><p>{client.document && client.document?.cnpj ? client.document?.cnpj : "Não informado"}</p></TableCell>
+            <TableCell><p>{client.address?.billing}</p></TableCell>
+            <TableCell><p>{client.address?.delivery}</p></TableCell>
+            <TableCell>
+              <div className="flex gap-2">
+                <DeleteClient client={client} />
+                <UpdateClient id={String(client.id)} />
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+        <TableRow>
+          <TableCell colSpan={7}><CreateClient clients={clients} /></TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   );
 };

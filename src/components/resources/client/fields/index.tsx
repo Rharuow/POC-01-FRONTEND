@@ -10,6 +10,7 @@ import { cnpjMask } from '@/lib/mask/cnpj';
 import { Button } from '@/components/ui/button';
 import Billing from './address/billing';
 import Delivery from './address/delivery';
+import { DialogClose } from '@/components/ui/dialog';
 
 const Fields = ({ isLoading }: { isLoading: boolean }) => {
 
@@ -70,7 +71,7 @@ const Fields = ({ isLoading }: { isLoading: boolean }) => {
           </TabsContent>
         </Tabs>
       </div>
-      <Button
+      <DialogClose
         type="submit"
         disabled={
           cnpjIsInvalid ||
@@ -79,7 +80,7 @@ const Fields = ({ isLoading }: { isLoading: boolean }) => {
         }
       >
         Salvar
-      </Button>
+      </DialogClose>
     </>
   )
 }

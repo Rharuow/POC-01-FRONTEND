@@ -8,14 +8,17 @@ import { useMutation } from '@apollo/client'
 import { GET_CLIENTS } from '@/service/queries/clients'
 import { apolloClient } from '@/lib/apollo'
 import { DELETE_CLIENT } from '@/service/mutation/client'
+import { useAccordionContext } from '@/pages'
 
 export default function DeleteClient({ client }: { client: Client }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+  const { setAccordionValue } = useAccordionContext()
 
   const [deleteClient] = useMutation(DELETE_CLIENT)
 
   async function handleDeleteClient(id: string) {
     try {
+      setAccordionValue("")
       await deleteClient({
         variables: { id },
         update: (cache) => {
@@ -28,6 +31,7 @@ export default function DeleteClient({ client }: { client: Client }) {
           });
         }
       })
+      setAccordionValue("clients")
       toast("Cliente deletado com sucesso...")
     } catch (error) {
       console.log("error = ", error);

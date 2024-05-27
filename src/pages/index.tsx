@@ -8,9 +8,22 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useQuery } from "@apollo/client";
+import { Client } from "@/components/resources/client/client";
+import { GET_CLIENTS } from "@/service/queries/clients";
+import LoadingClient from "@/components/resources/client/list/loading";
+import { Dispatch, SetStateAction, createContext, useContext, useState } from "react";
 
+type AccordionValue = "clients" | "products" | "orders" | ""
+
+const AccordionContext = createContext<{ setAccordionValue: Dispatch<SetStateAction<AccordionValue>> }>({ setAccordionValue: () => { } })
+
+export const useAccordionContext = () => useContext(AccordionContext)
 
 export default function Home() {
+  const { data: dataClient, loading } = useQuery<{ getClients: Array<Client> }>(GET_CLIENTS);
+  const [accordionValue, setAccordionValue] = useState<AccordionValue>("clients")
+
   return (
     <main
       className="bg-gray-900 min-h-svh flex flex-col gap-4 justify-between text-white"
@@ -18,27 +31,41 @@ export default function Home() {
       <NavBar />
 
       <div className="px-4 flex justify-center grow">
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem value="clients">
-            <AccordionTrigger>Clientes</AccordionTrigger>
-            <AccordionContent>
-              <ListClient />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="products">
-            <AccordionTrigger>Produtos</AccordionTrigger>
-            <AccordionContent>
-              <ListProduct />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-3">
-            <AccordionTrigger>Vendas</AccordionTrigger>
-            <AccordionContent>
-              <ListOrder />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <AccordionContext.Provider value={{ setAccordionValue }}>
+          <Accordion
+            type="single"
+            value={accordionValue}
+            collapsible
+            className="w-full"
+          >
+            <AccordionItem value="clients">
+              <AccordionTrigger
+                onClick={() => setAccordionValue(prevState => prevState === "clients" ? "" : "clients")}
+              >Clientes</AccordionTrigger>
+              {loading ?
+                <AccordionContent>
+                  <LoadingClient />
+                </AccordionContent> :
+                <AccordionContent>
+                  <ListClient clients={dataClient?.getClients as Array<Client>} />
+                </AccordionContent>
+              }
+            </AccordionItem>
+            <AccordionItem value="products">
+              <AccordionTrigger>Produtos</AccordionTrigger>
+              <AccordionContent>
+                <ListProduct />
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="orders">
+              <AccordionTrigger>Vendas</AccordionTrigger>
+              <AccordionContent>
+                <ListOrder />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </AccordionContext.Provider>
       </div>
-    </main>
+    </main >
   );
 }

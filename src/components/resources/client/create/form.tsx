@@ -11,11 +11,12 @@ import Loading from "./loading";
 import { formClientSchema } from "../schemas";
 import { IFormClient } from "../client";
 import Fields from "../fields";
-import { useOpenCreateClientModalContext } from ".";
+import { useAccordionContext } from "@/pages";
 
 export const FormCreateClient = () => {
   const [createClient] = useMutation(CREATE_CLIENT);
-  const { setIsOpen } = useOpenCreateClientModalContext();
+
+  const { setAccordionValue } = useAccordionContext()
 
   const methods = useForm<IFormClient>({
     resolver: zodResolver(formClientSchema),
@@ -34,6 +35,7 @@ export const FormCreateClient = () => {
   async function onSubmit(data: IFormClient) {
     try {
       setIsLoading(true);
+      setAccordionValue("")
       await createClient({
         variables: data,
         update: (cache, { data: { createClient } }) => {
@@ -46,8 +48,8 @@ export const FormCreateClient = () => {
           });
         },
       });
+      setAccordionValue("clients")
       toast("Cliente criado com sucesso");
-      setIsOpen(false);
     } catch (error) {
       console.error(error);
       toast("Desculpe, algo está errado!");
