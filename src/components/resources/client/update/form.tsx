@@ -4,17 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cpfMask } from "@/lib/mask/cpf";
-import { cnpjMask } from "@/lib/mask/cnpj";
-import { cpfIsValid } from "@/lib/validation/cpf";
-import { cnpjIsValid } from "@/lib/validation/cnpj";
 import { useMutation } from "@apollo/client";
 import { Client, IFormClient } from "../client";
 import { UPDATE_CLIENT } from "@/service/mutation/client";
 import { formClientSchema } from "../schemas";
 import Loading from "./loading";
-import InputGroup from "@/components/ui/inputGroup";
 import { apolloClient } from "@/lib/apollo";
 import { GET_CLIENTS } from "@/service/queries/clients";
 import Fields from "../fields";
@@ -35,15 +29,9 @@ export const FormUpdateClient = ({ setEditModalIsOpen, client }: { setEditModalI
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [typeDocument, setTypeDocument] = useState<"cpf" | "cnpj">(client.document?.cnpj ? "cnpj" : "cpf");
-  const [cpfIsInvalid, setCpfIsInvalid] = useState(false);
-  const [cnpjIsInvalid, setCnpjIsInvalid] = useState(false);
 
   const {
     handleSubmit,
-    register,
-    setValue,
-    formState: { errors },
   } = methods;
 
   async function onSubmit(data: IFormClient) {

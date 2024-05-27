@@ -32,7 +32,7 @@ export default function Home() {
   const { data: dataOrders, loading: loadingOrders } = useQuery<{ getOrders: Array<Order> }>(GET_ORDERS);
 
 
-  const [accordionValue, setAccordionValue] = useState<AccordionValue>("orders")
+  const [accordionValue, setAccordionValue] = useState<AccordionValue>("")
 
   return (
     <main

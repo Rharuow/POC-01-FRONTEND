@@ -1,0 +1,200 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Verificando renderização do component de formulário de criação de cliente 1`] = `
+<div>
+  <form
+    class="flex flex-col gap-4"
+  >
+    <div
+      class="flex flex-col gap-2"
+    >
+      <div
+        class="flex flex-col gap-2 md:grid md:grid-cols-2"
+      >
+        <div
+          class="flex flex-col"
+        >
+          <div
+            class="relative"
+          >
+            <input
+              class="flex h-10 w-full border z-10 border-input rounded-full bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              id="name"
+              name="name"
+            />
+            <label
+              class="text-gray-500 absolute top-1/2 -translate-y-1/2 left-3 animate-label-blur"
+              for="name"
+            >
+              Nome
+            </label>
+          </div>
+        </div>
+        <div
+          class="flex flex-col"
+        >
+          <div
+            class="relative"
+          >
+            <input
+              class="flex h-10 w-full border z-10 border-input rounded-full bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              id="email"
+              name="email"
+            />
+            <label
+              class="text-gray-500 absolute top-1/2 -translate-y-1/2 left-3 animate-label-blur"
+              for="email"
+            >
+              Email
+            </label>
+          </div>
+        </div>
+      </div>
+      <button
+        aria-controls="radix-:r3:"
+        aria-expanded="false"
+        aria-haspopup="dialog"
+        data-state="closed"
+        type="button"
+      >
+        <div
+          class="flex flex-col"
+        >
+          <div
+            class="relative"
+          >
+            <input
+              class="flex h-10 w-full border z-10 border-input rounded-full bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              id="billing"
+              name="billing"
+              readonly=""
+            />
+            <label
+              class="text-gray-500 absolute top-1/2 -translate-y-1/2 left-3 animate-label-blur"
+              for="billing"
+            >
+              Endereço  de cobrança
+            </label>
+          </div>
+        </div>
+      </button>
+      <button
+        aria-controls="radix-:r4:"
+        aria-expanded="false"
+        aria-haspopup="dialog"
+        data-state="closed"
+        type="button"
+      >
+        <div
+          class="flex flex-col"
+        >
+          <div
+            class="relative"
+          >
+            <input
+              class="flex h-10 w-full border z-10 border-input rounded-full bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              id="delivery"
+              name="delivery"
+              readonly=""
+            />
+            <label
+              class="text-gray-500 absolute top-1/2 -translate-y-1/2 left-3 animate-label-blur"
+              for="delivery"
+            >
+              Endreço de entrega
+            </label>
+          </div>
+        </div>
+      </button>
+      <div
+        data-orientation="horizontal"
+        dir="ltr"
+      >
+        <div
+          aria-orientation="horizontal"
+          class="h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground grid w-full grid-cols-2"
+          data-orientation="horizontal"
+          role="tablist"
+          style="outline: none;"
+          tabindex="0"
+        >
+          <button
+            aria-controls="radix-:r5:-content-cpf"
+            aria-selected="true"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            data-orientation="horizontal"
+            data-radix-collection-item=""
+            data-state="active"
+            id="radix-:r5:-trigger-cpf"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            CPF
+          </button>
+          <button
+            aria-controls="radix-:r5:-content-cnpj"
+            aria-selected="false"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            data-orientation="horizontal"
+            data-radix-collection-item=""
+            data-state="inactive"
+            id="radix-:r5:-trigger-cnpj"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            CNPJ
+          </button>
+        </div>
+        <div
+          aria-labelledby="radix-:r5:-trigger-cpf"
+          class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          data-orientation="horizontal"
+          data-state="active"
+          id="radix-:r5:-content-cpf"
+          role="tabpanel"
+          style="animation-duration: 0s;"
+          tabindex="0"
+        >
+          <div
+            class="flex flex-col"
+          >
+            <div
+              class="relative"
+            >
+              <input
+                class="flex h-10 w-full border z-10 border-input rounded-full bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                id="cpf"
+                name="cpf"
+              />
+              <label
+                class="text-gray-500 absolute top-1/2 -translate-y-1/2 left-3 animate-label-blur"
+                for="cpf"
+              >
+                CPF
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          aria-labelledby="radix-:r5:-trigger-cnpj"
+          class="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          data-orientation="horizontal"
+          data-state="inactive"
+          hidden=""
+          id="radix-:r5:-content-cnpj"
+          role="tabpanel"
+          tabindex="0"
+        />
+      </div>
+    </div>
+    <button
+      class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-900 text-white hover:bg-gray-900/90 h-10 px-4 py-2"
+      type="submit"
+    >
+      Salvar
+    </button>
+  </form>
+</div>
+`;
