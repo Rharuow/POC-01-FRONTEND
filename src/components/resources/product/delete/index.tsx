@@ -9,14 +9,17 @@ import { apolloClient } from '@/lib/apollo'
 import { GET_PRODUCTS } from '@/service/queries/products'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { useAccordionContext } from '@/pages'
 
 export default function DeleteProduct({ product }: { product: Product }) {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+  const { setAccordionValue } = useAccordionContext()
 
   const [deleteProduct] = useMutation(DELETE_PRODUCT)
 
   async function handleDeleteProduct(id: string) {
     try {
+      setAccordionValue("")
       await deleteProduct({
         variables: { id },
         update: (cache) => {
@@ -30,6 +33,7 @@ export default function DeleteProduct({ product }: { product: Product }) {
           });
         }
       })
+      setAccordionValue("products")
       toast("Produto deletado com sucesso...")
     } catch (error) {
       console.log("error = ", error);

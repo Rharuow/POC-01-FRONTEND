@@ -6,6 +6,7 @@ import TextareaGroup from '@/components/ui/textareaGroup'
 import { Category } from '../../category/category'
 import { Button } from '@/components/ui/button'
 import Categories from './categories'
+import { DialogClose } from '@/components/ui/dialog'
 
 const Fields = ({ categories, isLoading }: { categories: Array<Category>; isLoading: boolean }) => {
 
@@ -24,15 +25,13 @@ const Fields = ({ categories, isLoading }: { categories: Array<Category>; isLoad
 
         <Categories categories={categories} />
       </div>
-      <Button
-        type="submit"
+      <DialogClose type="submit" className='bg-primary text-white p-2 rounded-lg'
         disabled={
           Object.keys(errors).length !== 0 ||
           isLoading
-        }
-      >
+        }>
         Salvar
-      </Button>
+      </DialogClose>
     </>
   )
 }

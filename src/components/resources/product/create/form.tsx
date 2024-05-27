@@ -13,10 +13,13 @@ import { formProdcutSchema } from "../schemas";
 import { IFormProduct, ProductInput } from "../product";
 import Loading from "./loading";
 import Fields from "../fields";
+import { useAccordionContext } from "@/pages";
 
 export const FormCreateProduct = () => {
   const [createProduct] = useMutation(CREATE_PRODUCT);
   const { data: categoryData, loading } = useQuery<{ getCategories: Array<Category> }>(GET_CATEGORIES)
+
+  const { setAccordionValue } = useAccordionContext()
 
   const methods = useForm<IFormProduct>({
     resolver: zodResolver(formProdcutSchema),
@@ -31,6 +34,7 @@ export const FormCreateProduct = () => {
 
   async function onSubmit(data: IFormProduct) {
     try {
+      setAccordionValue("")
       setIsLoading(true);
       const formattedData: ProductInput = {
         name: data.name,
@@ -54,6 +58,7 @@ export const FormCreateProduct = () => {
           });
         },
       });
+      setAccordionValue("products")
       toast("Produto criado com sucesso");
     } catch (error) {
       console.log(error);

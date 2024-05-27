@@ -1,55 +1,54 @@
 import React from "react";
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { useQuery } from "@apollo/client";
-import { CardProduct } from "./card";
-import { cn } from "@/lib/utils";
 import { Product } from "../product";
-import { GET_PRODUCTS } from "@/service/queries/products";
 import { CreateProduct } from "../create";
-import Loading from "./loading";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import DeleteProduct from "../delete";
+import UpdateProduct from "../update";
+import { formatCurrency } from "@/utils/currencyConverter";
 
-export const ListProduct = () => {
-  const { data, loading } = useQuery<{ getProducts: Array<Product> }>(GET_PRODUCTS);
-
+export const ListProduct = ({ products }: { products: Array<Product> }) => {
   return (
-    <Carousel className="w-full">
-      <CarouselContent className="w-full">
-        {loading
-          ? <Loading />
-          :
-          <>
-            <CarouselItem
-              className={cn({
-                "lg:basis-auto flex justify-center grow": data?.getProducts.length === 0,
-                "md:basis-1/2 lg:basis-1/4": data?.getProducts && data?.getProducts.length >= 4,
-                "md:basis-1/2 lg:basis-1/3": data?.getProducts.length === 3,
-                "md:basis-1/2 lg:basis-1/2": data?.getProducts && data?.getProducts.length <= 2,
-              })}
-              key={data?.getProducts.length}
-            >
-              <CreateProduct products={data?.getProducts as Array<Product>} />
-            </CarouselItem>
-            {data?.getProducts.map((product, _, self) => (
-              <CarouselItem
-                className={cn("md:basis-1/2", {
-                  "lg:basis-1/4": self.length >= 4,
-                  "lg:basis-1/3": self.length === 3,
-                  "lg:basis-1/2": self.length <= 2,
-                })}
-                key={product.id}
-              >
-                <CardProduct product={product} />
-              </CarouselItem>
-            ))}
-          </>
-        }
-
-      </CarouselContent>
-    </Carousel>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Preço</TableHead>
+          <TableHead>Descrição</TableHead>
+          <TableHead>Categorias</TableHead>
+          <TableHead></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {products.map((product) => (
+          <TableRow key={product.id}>
+            <TableCell><p>{product.name}</p></TableCell>
+            <TableCell><p>{formatCurrency(Number(product.price))}</p></TableCell>
+            <TableCell><p>{product.description}</p></TableCell>
+            <TableCell className="flex flex-wrap gap-1">
+              {product.categories?.map(category => (
+                <p
+                  className="text-xs bg-slate-100 text-black rounded-full text-center py-[1px] px-1"
+                  key={category.categoryName}
+                >
+                  {category.categoryName}
+                </p>
+              ))}
+            </TableCell>
+            <TableCell>
+              <div className="flex gap-2">
+                <DeleteProduct product={product} />
+                <UpdateProduct id={String(product.id)} />
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+        <TableRow>
+          <TableCell colSpan={7}>
+            <CreateProduct products={products} />
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   );
 };
