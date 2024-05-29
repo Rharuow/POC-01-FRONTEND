@@ -9,7 +9,7 @@ const Delivery = () => {
   return (
     <Popover>
       <PopoverTrigger>
-        <InputGroup label="Endreço de entrega" name="delivery" readOnly />
+        <InputGroup label="Endereço de entrega" name="delivery" readOnly />
       </PopoverTrigger>
       <Fields fieldName='delivery' />
     </Popover>

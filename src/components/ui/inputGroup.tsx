@@ -39,7 +39,7 @@ const InputGroup = React.forwardRef<
                     {...props}
                   />
                   {errors && errors[String(name)] && (
-                    <span className="text-xs text-red-400 font-bold">
+                    <span role="alert" id={String(name)} className="text-xs text-red-400 font-bold">
                       {String(errors[String(name)]?.message)}
                     </span>
                   )}
@@ -63,7 +63,7 @@ const InputGroup = React.forwardRef<
               {...props}
             />
             {errors && errors[String(name)] && (
-              <span className="text-xs text-red-400 font-bold">
+              <span role="alert" id={String(name)} className="text-xs text-red-400 font-bold">
                 {String(errors[String(name)]?.message)}
               </span>
             )}

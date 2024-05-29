@@ -9,7 +9,7 @@ const Billing = () => {
   return (
     <Popover>
       <PopoverTrigger>
-        <InputGroup label="Endereço  de cobrança" name="billing" readOnly />
+        <InputGroup label="Endereço de cobrança" name="billing" readOnly />
       </PopoverTrigger>
       <Fields fieldName='billing' />
     </Popover>

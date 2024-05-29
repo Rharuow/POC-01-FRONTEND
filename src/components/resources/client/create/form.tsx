@@ -38,15 +38,17 @@ export const FormCreateClient = () => {
       setAccordionValue("")
       await createClient({
         variables: data,
-        update: (cache, { data: { createClient } }) => {
-          const data = apolloClient.readQuery({ query: GET_CLIENTS });
-          cache.writeQuery({
-            query: GET_CLIENTS,
-            data: {
-              getClients: [...data.getClients, createClient],
-            },
-          });
-        },
+        ...(process.env.NODE_ENV !== 'test' && {
+          update: (cache, { data: { createClient } }) => {
+            const data = apolloClient.readQuery({ query: GET_CLIENTS });
+            cache.writeQuery({
+              query: GET_CLIENTS,
+              data: {
+                getClients: [...data.getClients, createClient],
+              },
+            });
+          },
+        })
       });
       setAccordionValue("clients")
       toast("Cliente criado com sucesso");

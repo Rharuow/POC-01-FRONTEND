@@ -31,7 +31,6 @@ export default function Home() {
   const { data: dataProducts, loading: loadingProducts } = useQuery<{ getProducts: Array<Product> }>(GET_PRODUCTS)
   const { data: dataOrders, loading: loadingOrders } = useQuery<{ getOrders: Array<Order> }>(GET_ORDERS);
 
-
   const [accordionValue, setAccordionValue] = useState<AccordionValue>("")
 
   return (

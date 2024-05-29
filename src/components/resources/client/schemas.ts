@@ -3,16 +3,15 @@ import { z } from "zod";
 export const formClientSchema = z
   .object({
     name: z.string().min(4, { message: "Pelo menos 4 caracteres" }),
-    cpf: z.string({ message: "CPF obrigatório" }).optional(),
-    cnpj: z.string({ message: "CNPJ obrigatório" }).optional(),
+    cpf: z.string({ message: "CPF é obrigatório" }).optional(),
+    cnpj: z.string({ message: "CNPJ é obrigatório" }).optional(),
     email: z
       .string({ required_error: "O email é obrigatório" })
       .email("Este é um email inválido."),
     billing: z.string({
-      message: "Campo obrigatório",
-      required_error: "O email é obrigatório",
+      message: "Endereço de cobrança é obrigatório",
     }),
-    delivery: z.string({ message: "Campo obrigatório" }),
+    delivery: z.string({ message: "Endereço de entrega é obrigatório" }),
     zipCode: z.string().optional(),
     neighborhood: z.string().optional(),
     state: z.string().optional(),
