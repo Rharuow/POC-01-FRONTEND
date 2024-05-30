@@ -86,7 +86,7 @@ const Fields = ({ fieldName }: { fieldName: FieldName }) => {
               label='CEP'
               name='zipCode'
               maxLength={9}
-              onChange={(e) => onChangeCEP(applyCEPMask(e.target.value))}
+              onChange={async (e) => await onChangeCEP(applyCEPMask(e.target.value))}
               {...(getValues("zipCode") && { defaultValue: getValues("zipCode") })}
             />
             <InputGroup className='bg-white' label='Número' name='number' />

@@ -1275,6 +1275,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
+"@types/@testing-library/user-event":
+  version "0.0.0-semantically-released"
+  resolved "https://codeload.github.com/testing-library/user-event/tar.gz/d0362796a33c2d39713998f82ae309020c37b385"
+
 "@types/aria-query@^5.0.1":
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.4.tgz#1a31c3d378850d2778dabb6374d036dcba4ba708"

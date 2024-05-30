@@ -33,11 +33,13 @@ export const FormCreateClient = () => {
   } = methods;
 
   async function onSubmit(data: IFormClient) {
+    const { zipCode, neighborhood, state, city, number, street, complement, ...filteredData } = data;
+
     try {
       setIsLoading(true);
       setAccordionValue("")
       await createClient({
-        variables: data,
+        variables: filteredData,
         ...(process.env.NODE_ENV !== 'test' && {
           update: (cache, { data: { createClient } }) => {
             const data = apolloClient.readQuery({ query: GET_CLIENTS });

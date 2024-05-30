@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
-import { screen, render, fireEvent, waitFor } from '@testing-library/react'
+import { screen, render, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { toast } from "sonner";
 
 import { MockedProvider } from "@apollo/client/testing";
@@ -8,19 +9,34 @@ import { Dialog } from "@/components/ui/dialog";
 import { CREATE_CLIENT } from "@/service/mutation/client";
 import { GET_CLIENTS } from "@/service/queries/clients";
 
+
+const mockCepData = {
+  uf: 'CE',
+  localidade: 'Fortaleza',
+  bairro: 'Bom Jardim',
+  logradouro: 'Travessa Getúlio Vargas',
+};
+
 // Mock the toast function
 jest.mock('sonner', () => ({
   toast: jest.fn(),
 }));
 
-const mockRequest = {
+// Mocking viacepAPI
+jest.mock('../../../../service/viacep', () => ({
+  viacepAPI: {
+    get: jest.fn(async () => await Promise.resolve({ data: mockCepData })),
+  },
+}));
+
+const mockRequestsCreateClient = {
   request: {
     query: CREATE_CLIENT,
     variables: {
       name: 'John Doe',
       email: 'john@example.com',
-      billing: 'test address billing',
-      delivery: 'test address delivery',
+      billing: '2, 60543-480 - Travessa Getúlio Vargas, Bom Jardim - Fortaleza, CE ',
+      delivery: '2, 60543-480 - Travessa Getúlio Vargas, Bom Jardim - Fortaleza, CE ',
       cpf: '123.456.789-09',
       cnpj: '',
     },
@@ -32,8 +48,8 @@ const mockRequest = {
         name: 'John Doe',
         email: 'john@example.com',
         address: {
-          billing: 'test address billing',
-          delivery: 'test address delivery',
+          billing: '2, 60543-480 - Travessa Getúlio Vargas, Bom Jardim - Fortaleza, CE ',
+          delivery: '2, 60543-480 - Travessa Getúlio Vargas, Bom Jardim - Fortaleza, CE ',
         },
         document: {
           cpf: '123.456.789-09',
@@ -44,38 +60,36 @@ const mockRequest = {
   },
 }
 
-const mockResponse = {
-  request: {
-    query: GET_CLIENTS,
-  },
-  result: {
-    data: {
-      getClients: [
-        {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          address: {
-            billing: 'test address billing',
-            delivery: 'test address delivery',
+const mocks = [
+  mockRequestsCreateClient,
+  {
+    request: {
+      query: GET_CLIENTS,
+    },
+    result: {
+      data: {
+        getClients: [
+          {
+            id: '1',
+            name: 'Existing Client',
+            email: 'existing@example.com',
+            address: {
+              billing: 'test address billing',
+              delivery: 'test address delivery',
+            },
+            document: {
+              cpf: '123.456.789-09',
+              cnpj: '',
+            }
           },
-          document: {
-            cpf: '123.456.789-09',
-            cnpj: '',
-          }
-        },
-      ],
+        ],
+      },
     },
   },
-}
-
-const mocks = [
-  mockRequest,
-  mockResponse
 ];
 
 const setup = () => {
-  const utils = render(
+  const result = render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <Dialog open={true}>
         <FormCreateClient />
@@ -83,107 +97,116 @@ const setup = () => {
     </MockedProvider>
   )
 
-  const nameInput = screen.getByRole("textbox", { name: /Nome/i })
-  const emailInput = screen.getByRole("textbox", { name: /Email/i })
-  const billingInput = screen.getByRole("textbox", { name: /Endereço de cobrança/i })
-  const deliveryInput = screen.getByRole("textbox", { name: /Endereço de entrega/i })
-  const cpfInput = screen.getByRole("textbox", { name: /CPF/i })
+  const user = userEvent.setup()
 
-  const btnSubmit = screen.getByText('Salvar')
-  const btnTabCNPJ = screen.getByText("CNPJ")
-
-  return {
-    btnSubmit,
-    btnTabCNPJ,
-    nameInput,
-    emailInput,
-    billingInput,
-    deliveryInput,
-    cpfInput,
-    ...utils
-  }
+  return { result, user }
 }
 
-it(`When a user attempts to submit a form to create a client without filling in the required fields, including 'name', 'email', 'billing', 'delivery', and 'CPF', the spans below these fields appear with feedback indicating the necessary requirements to validate each field: 
-- name: 'Pelo menos 4 caracteres' 
-- email: 'Este é um email inválido.'
-- billing: 'Endereço de cobrança é obrigatório' 
-- delivery: 'Endereço de entrega é obrigatório' 
-- cpf: 'CPF obrigatório' 
-`, async () => {
-  const { btnSubmit } = setup()
+describe("Creating a new client", () => {
+  it(`When a user submit the form without fill required fields, should the alerts must be showed in all of this fields`, async () => {
+    const { user } = setup()
 
-  fireEvent.submit(btnSubmit)
+    const btnSubmit = screen.getByRole('button', {
+      name: /Salvar/i
+    })
 
-  const spanAlerts = await screen.findAllByRole("alert")
+    await user.click(btnSubmit)
 
-  expect(spanAlerts).toHaveLength(5)
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'name')?.innerHTML).toBe('Pelo menos 4 caracteres')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'email')?.innerHTML).toBe('Este é um email inválido.')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'billing')?.innerHTML).toBe('Endereço de cobrança é obrigatório')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'delivery')?.innerHTML).toBe('Endereço de entrega é obrigatório')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'cpf')?.innerHTML).toBe('CPF é obrigatório')
-})
+    const spanAlerts = await screen.findAllByRole("alert")
 
-it(`When a user clicks on the 'CNPJ' tab and attempts to submit the form without filling it, the feedback spans below the fields appear with similar feedback to the previous test, except for the 'CPF' field, which is replaced by 'CNPJ':
-- name: 'Pelo menos 4 caracteres' 
-- email: 'Este é um email inválido.'
-- billing: 'Endereço de cobrança é obrigatório' 
-- delivery: 'Endereço de entrega é obrigatório' 
-- cnpj: "CNPJ é obrigatório"
-`, async () => {
-  const { btnSubmit, btnTabCNPJ } = setup()
+    expect(spanAlerts).toHaveLength(5)
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'name')?.innerHTML).toBe('Pelo menos 4 caracteres')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'email')?.innerHTML).toBe('Este é um email inválido.')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'billing')?.innerHTML).toBe('Endereço de cobrança é obrigatório')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'delivery')?.innerHTML).toBe('Endereço de entrega é obrigatório')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'cpf')?.innerHTML).toBe('CPF é obrigatório')
+  })
 
-  let fields = await screen.findAllByRole("textbox")
+  it(`When a user clicks on the 'CNPJ' tab and submit the form without fill required fields, should the alerts must be showed in all of this fields`, async () => {
+    const { user } = setup()
+    const btnTabCNPJ = screen.getByText("CNPJ")
+    const btnSubmit = screen.getByRole('button', {
+      name: /Salvar/i
+    })
 
-  // Check if the cpf field is includes in form
-  expect(fields.some(field => field.getAttribute("name") === "cpf")).toBeTruthy()
+    let fields = await screen.findAllByRole("textbox")
 
-  // Check if the cnpj field isn't includes in form
-  expect(fields.some(field => field.getAttribute("name") === "cnpj")).toBeFalsy()
+    // Check if the cpf field is includes in form
+    expect(fields.some(field => field.getAttribute("name") === "cpf")).toBeTruthy()
 
-  fireEvent.mouseDown(btnTabCNPJ)
+    // Check if the cnpj field isn't includes in form
+    expect(fields.some(field => field.getAttribute("name") === "cnpj")).toBeFalsy()
 
-  fields = await screen.findAllByRole("textbox")
+    await user.click(btnTabCNPJ)
 
-  // Check if the cpf field isn't includes in form
-  expect(fields.some(field => field.getAttribute("name") === "cpf")).toBeFalsy()
+    fields = await screen.findAllByRole("textbox")
 
-  // Check if the cnpj field is includes in form
-  expect(fields.some(field => field.getAttribute("name") === "cnpj")).toBeTruthy()
+    // Check if the cpf field isn't includes in form
+    expect(fields.some(field => field.getAttribute("name") === "cpf")).toBeFalsy()
 
-  fireEvent.submit(btnSubmit)
+    // Check if the cnpj field is includes in form
+    expect(fields.some(field => field.getAttribute("name") === "cnpj")).toBeTruthy()
 
-  const spanAlerts = await screen.findAllByRole("alert")
+    await user.click(btnSubmit)
 
-  expect(spanAlerts).toHaveLength(5)
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'name')?.innerHTML).toBe('Pelo menos 4 caracteres')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'email')?.innerHTML).toBe('Este é um email inválido.')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'billing')?.innerHTML).toBe('Endereço de cobrança é obrigatório')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'delivery')?.innerHTML).toBe('Endereço de entrega é obrigatório')
-  expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'cnpj')?.innerHTML).toBe('CNPJ é obrigatório')
-})
+    const spanAlerts = await screen.findAllByRole("alert")
 
-it(`When a user attempts to submit a form to create a client filling in the required fields, including 'name', 'email', 'billing', 'delivery', and 'CPF', a toast is trigged with text 'Cliente criado com sucesso'`, async () => {
-  const { btnSubmit, nameInput, emailInput, billingInput, deliveryInput, cpfInput } = setup()
+    expect(spanAlerts).toHaveLength(5)
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'name')?.innerHTML).toBe('Pelo menos 4 caracteres')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'email')?.innerHTML).toBe('Este é um email inválido.')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'billing')?.innerHTML).toBe('Endereço de cobrança é obrigatório')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'delivery')?.innerHTML).toBe('Endereço de entrega é obrigatório')
+    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'cnpj')?.innerHTML).toBe('CNPJ é obrigatório')
+  })
 
-  // Fill in the form fields
-  fireEvent.input(nameInput, { target: { value: mockRequest.request.variables.name } });
-  fireEvent.input(emailInput, { target: { value: mockRequest.request.variables.email } });
+  it(`When a user attempts to submit a form to create a client filling in the required fields, a toast is trigged with text 'Cliente criado com sucesso'`, async () => {
+    const { user } = setup()
+    const mockedCEP = "60543-480"
+    const mockedNumber = "2"
 
+    const nameInput = screen.getByRole("textbox", { name: /nome/i })
+    const emailInput = screen.getByRole("textbox", { name: /email/i })
 
-  // Assuming there are fields for billing and delivery addresses
-  fireEvent.input(billingInput, { target: { value: mockRequest.request.variables.billing } });
-  fireEvent.input(deliveryInput, { target: { value: mockRequest.request.variables.delivery } });
+    const billingInput = screen.getByRole("textbox", { name: /endereço de cobrança/i })
+    const deliveryInput = screen.getByRole("textbox", { name: /endereço de entrega/i })
 
-  fireEvent.input(cpfInput, { target: { value: mockRequest.request.variables.cpf } });
+    const cpfInput = screen.getByRole("textbox", { name: /cpf/i })
 
-  fireEvent.submit(btnSubmit)
+    const btnSubmit = screen.getByRole('button', {
+      name: /salvar/i
+    })
 
-  // Check if the success toast was shown
-  await waitFor(() => {
-    // Check if the toast was called with the success message
-    expect(toast).toHaveBeenCalledWith('Cliente criado com sucesso');
-  });
+    // Fill in the form fields
+    await user.type(nameInput, mockRequestsCreateClient.request.variables.name);
+    await user.type(emailInput, mockRequestsCreateClient.request.variables.email);
 
+    // add flow of billing input modal with cep and number field
+    await user.click(billingInput);
+    let cepInput = screen.getByRole("textbox", { name: /cep/i })
+    let numberInput = screen.getByRole("textbox", { name: /número/i })
+    let saveAddressButton = screen.getAllByRole("button", { name: /salvar/i })[1]
+    await user.type(cepInput, mockedCEP)
+    await user.type(numberInput, mockedNumber)
+    await user.click(saveAddressButton)
+
+    await user.click(deliveryInput);
+    cepInput = screen.getByRole("textbox", { name: /cep/i })
+    numberInput = screen.getByRole("textbox", { name: /número/i })
+    saveAddressButton = screen.getAllByRole("button", { name: /salvar/i })[1]
+    await user.type(cepInput, mockedCEP)
+    await user.type(numberInput, mockedNumber)
+    await user.click(saveAddressButton)
+
+    await user.click(cpfInput)
+    await user.type(cpfInput, mockRequestsCreateClient.request.variables.cpf);
+
+    await user.click(btnSubmit)
+
+    // Check if the success toast was shown
+    await waitFor(() => {
+      // Check if the toast was called with the success message
+      expect(toast).toHaveBeenCalledWith('Cliente criado com sucesso');
+    });
+
+  })
 })
