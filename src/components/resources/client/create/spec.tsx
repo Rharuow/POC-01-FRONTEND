@@ -55,8 +55,8 @@ const mockRequestsCreateClient = {
           delivery: '2, 60543-480 - Travessa Getúlio Vargas, Bom Jardim - Fortaleza, CE ',
         },
         document: {
-          cpf: '123.456.789-09',
-          cnpj: '',
+          cpf: mockCpf,
+          cnpj: mockCnpj,
         }
       },
     },
@@ -233,6 +233,76 @@ describe("Creating a new client", () => {
     const btnSubmit = screen.getByRole('button', {
       name: /Salvar/i
     })
+
+    await user.click(btnTabCNPJ)
+
+    const cnpjInput = screen.getByRole("textbox", { name: /cnpj/i })
+
+    let fields = await screen.findAllByRole("textbox")
+
+    // Check if the cpf field isn't includes in form
+    expect(fields.some(field => field.getAttribute("name") === "cpf")).toBeFalsy()
+
+    // Check if the cnpj field is includes in form
+    expect(fields.some(field => field.getAttribute("name") === "cnpj")).toBeTruthy()
+
+
+    // Fill in the form fields
+    await user.type(nameInput, mockRequestsCreateClient.request.variables.name);
+    await user.type(emailInput, mockRequestsCreateClient.request.variables.email);
+
+    // add flow of billing input modal with cep and number field
+    await user.click(billingInput);
+    let cepInput = screen.getByRole("textbox", { name: /cep/i })
+    let numberInput = screen.getByRole("textbox", { name: /número/i })
+    let saveAddressButton = screen.getAllByRole("button", { name: /salvar/i })[1]
+    await user.type(cepInput, mockedCEP)
+    await user.type(numberInput, mockedNumber)
+    await user.click(saveAddressButton)
+
+    await user.click(deliveryInput);
+    cepInput = screen.getByRole("textbox", { name: /cep/i })
+    numberInput = screen.getByRole("textbox", { name: /número/i })
+    saveAddressButton = screen.getAllByRole("button", { name: /salvar/i })[1]
+    await user.type(cepInput, mockedCEP)
+    await user.type(numberInput, mockedNumber)
+    await user.click(saveAddressButton)
+
+    await user.click(cnpjInput)
+    await user.type(cnpjInput, mockRequestsCreateClient.request.variables.cnpj);
+
+    await user.click(btnSubmit)
+
+    // Check if the success toast was shown
+    await waitFor(() => {
+      // Check if the toast was called with the success message
+      expect(toast).toHaveBeenCalledWith('Cliente criado com sucesso');
+    });
+  })
+
+  it(`When a user fill all the input including cnpj and cpf, a toast is trigged with text 'Cliente criado com sucesso`, async () => {
+    // reseting mock apollo request to cpnj case
+    mockRequestsCreateClient.request.variables.cpf = mockCpf
+    mockRequestsCreateClient.request.variables.cnpj = mockCnpj
+    const { user } = setup()
+
+    const mockedCEP = "60543-480"
+    const mockedNumber = "2"
+
+    const nameInput = screen.getByRole("textbox", { name: /nome/i })
+    const emailInput = screen.getByRole("textbox", { name: /email/i })
+
+    const billingInput = screen.getByRole("textbox", { name: /endereço de cobrança/i })
+    const deliveryInput = screen.getByRole("textbox", { name: /endereço de entrega/i })
+
+    const btnTabCNPJ = screen.getByText("CNPJ")
+    const btnSubmit = screen.getByRole('button', {
+      name: /Salvar/i
+    })
+
+    const cpfInput = screen.getByRole("textbox", { name: /cpf/i })
+
+    await user.type(cpfInput, mockCpf)
 
     await user.click(btnTabCNPJ)
 
