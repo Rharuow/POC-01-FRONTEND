@@ -10,8 +10,14 @@ import { apolloClient } from '@/lib/apollo'
 import { DELETE_CLIENT } from '@/service/mutation/client'
 import { useAccordionContext } from '@/pages'
 
-export default function DeleteClient({ client }: { client: Client }) {
-  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false)
+
+interface DeleteClientProps {
+  client: Client;
+  initialDeleteModalIsOpen?: boolean;
+}
+
+export default function DeleteClient({ client, initialDeleteModalIsOpen = false }: DeleteClientProps) {
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(initialDeleteModalIsOpen)
   const { setAccordionValue } = useAccordionContext()
 
   const [deleteClient] = useMutation(DELETE_CLIENT)
@@ -26,7 +32,7 @@ export default function DeleteClient({ client }: { client: Client }) {
           cache.writeQuery({
             query: GET_CLIENTS,
             data: {
-              getClients: data.getClients.filter((clt: Client) => clt.id !== client.id),
+              getClients: data ? data.getClients.filter((clt: Client) => clt.id !== client.id) : [],
             },
           });
         }
