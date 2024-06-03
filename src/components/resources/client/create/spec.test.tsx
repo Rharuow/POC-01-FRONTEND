@@ -115,14 +115,20 @@ describe("Creating a new client", () => {
 
     await user.click(btnSubmit)
 
-    const spanAlerts = await screen.findAllByRole("alert")
+    const [alerts, ...spans] = await Promise.all([
+      screen.findAllByRole("alert"),
+      screen.findByText('Pelo menos 4 caracteres'),
+      screen.findByText('Este é um email inválido.'),
+      screen.findByText('Endereço de cobrança é obrigatório'),
+      screen.findByText('Endereço de entrega é obrigatório'),
+      screen.findByText('CPF é obrigatório')
+    ])
 
-    expect(spanAlerts).toHaveLength(5)
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'name')?.innerHTML).toBe('Pelo menos 4 caracteres')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'email')?.innerHTML).toBe('Este é um email inválido.')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'billing')?.innerHTML).toBe('Endereço de cobrança é obrigatório')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'delivery')?.innerHTML).toBe('Endereço de entrega é obrigatório')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'cpf')?.innerHTML).toBe('CPF é obrigatório')
+
+    expect(alerts).toHaveLength(5)
+    spans.forEach((span) => {
+      expect(span).toBeVisible()
+    })
   })
 
   it(`When a user clicks on the 'CNPJ' tab and submit the form without fill required fields, should the alerts must be showed in all of this fields`, async () => {
@@ -152,14 +158,20 @@ describe("Creating a new client", () => {
 
     await user.click(btnSubmit)
 
-    const spanAlerts = await screen.findAllByRole("alert")
+    const [alerts, ...spans] = await Promise.all([
+      screen.findAllByRole("alert"),
+      screen.findByText('Pelo menos 4 caracteres'),
+      screen.findByText('Este é um email inválido.'),
+      screen.findByText('Endereço de cobrança é obrigatório'),
+      screen.findByText('Endereço de entrega é obrigatório'),
+      screen.findByText('CNPJ é obrigatório')
+    ])
 
-    expect(spanAlerts).toHaveLength(5)
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'name')?.innerHTML).toBe('Pelo menos 4 caracteres')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'email')?.innerHTML).toBe('Este é um email inválido.')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'billing')?.innerHTML).toBe('Endereço de cobrança é obrigatório')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'delivery')?.innerHTML).toBe('Endereço de entrega é obrigatório')
-    expect(spanAlerts.find(spanAlert => spanAlert.getAttribute("id") === 'cnpj')?.innerHTML).toBe('CNPJ é obrigatório')
+
+    expect(alerts).toHaveLength(5)
+    spans.forEach((span) => {
+      expect(span).toBeVisible()
+    })
   })
 
   it(`When a user attempts to submit a form to create a client filling in the required fields, a toast is trigged with text 'Cliente criado com sucesso'`, async () => {
